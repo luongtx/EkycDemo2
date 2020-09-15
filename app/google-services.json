@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1072631829385",
+    "firebase_url": "https://ekyc-demo-7d3a0.firebaseio.com",
+    "project_id": "ekyc-demo-7d3a0",
+    "storage_bucket": "ekyc-demo-7d3a0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1072631829385:android:ba3ad72edde01c23060758",
+        "android_client_info": {
+          "package_name": "com.example.ekycdemo2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1072631829385-pgl5qatohjg88rsv6vj0k427apj2c7g6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbfey1vdCUcvaXsi3NfCHlT8QueFFMRGM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1072631829385-pgl5qatohjg88rsv6vj0k427apj2c7g6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
