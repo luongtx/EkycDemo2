@@ -4,14 +4,25 @@ import android.annotation.SuppressLint
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.example.ekycdemo2.processor.util.FaceRotation
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.Face
+import com.google.mlkit.vision.face.FaceDetection
+import com.google.mlkit.vision.face.FaceDetector
+import com.google.mlkit.vision.face.FaceDetectorOptions
 
-import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
-import com.google.firebase.ml.vision.face.FirebaseVisionFace
-import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector
 
-class FaceAnalyzer(val faceDetector: FirebaseVisionFaceDetector) : ImageAnalysis.Analyzer {
+class FaceAnalyzer : ImageAnalysis.Analyzer {
 
+    private var faceDetector: FaceDetector
+
+    init {
+        //set firebase detector options
+        val options = FaceDetectorOptions.Builder()
+            .setClassificationMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
+            .enableTracking()
+            .build();
+        faceDetector = FaceDetection.getClient(options);
+    }
 
     interface CallBackAnalyzer {
         fun onFaceAngleChange(rotation: Int)
@@ -23,42 +34,47 @@ class FaceAnalyzer(val faceDetector: FirebaseVisionFaceDetector) : ImageAnalysis
         this.callBackAnalyzer = callBackAnalyzer
     }
 
-    private fun degreesToFirebaseRotation(degrees: Int): Int = when (degrees) {
-        0 -> FirebaseVisionImageMetadata.ROTATION_0
-        90 -> FirebaseVisionImageMetadata.ROTATION_90
-        180 -> FirebaseVisionImageMetadata.ROTATION_180
-        270 -> FirebaseVisionImageMetadata.ROTATION_270
-        else -> throw Exception("Rotation must be 0, 90, 180, or 270.")
-    }
 
     @SuppressLint("UnsafeExperimentalUsageError")
     override fun analyze(imageProxy: ImageProxy) {
         val mediaImage = imageProxy.image
-        val imageRotation = degreesToFirebaseRotation(imageProxy.imageInfo.rotationDegrees)
         if (mediaImage != null) {
-            val image = FirebaseVisionImage.fromMediaImage(mediaImage, imageRotation)
+            val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
             // Pass image to an ML Kit Vision API
             // ...
-            faceDetector.detectInImage(image)
-                .addOnSuccessListener {
-                    faces -> processListFace(faces)
+            faceDetector.process(image)
+                .addOnSuccessListener { faces ->
+                    processListFace(faces)
+                    imageProxy.close()
                 }
-                .addOnFailureListener {
-
+                .addOnFailureListener { e ->
+                    e.printStackTrace()
+                    imageProxy.close()
                 }
         }
     }
-    private fun processListFace(faces: List<FirebaseVisionFace>) {
+
+    private fun processListFace(faces: List<Face>) {
         for (face in faces) {
-            var rotY = face.headEulerAngleY
-//            println("rotY: $rotY")
-//            println("rotX: $rotX")
+            val rotY = face.headEulerAngleY
+            val rotX = face.headEulerAngleX
             when {
                 rotY > FaceRotation.ANGLE -> callBackAnalyzer.onFaceAngleChange(FaceRotation.LEFT)
                 rotY < -FaceRotation.ANGLE -> callBackAnalyzer.onFaceAngleChange(FaceRotation.RIGHT)
-                rotY in -FaceRotation.STRAIGHT_BOUNDARY..FaceRotation.STRAIGHT_BOUNDARY
-                -> callBackAnalyzer.onFaceAngleChange(FaceRotation.STRAIGHT)
+                else -> {
+                    when {
+                        rotX > FaceRotation.ANGLE -> callBackAnalyzer.onFaceAngleChange(FaceRotation.UP)
+                        rotX < -FaceRotation.ANGLE -> callBackAnalyzer.onFaceAngleChange(FaceRotation.DOWN)
+                        rotX in -FaceRotation.STRAIGHT_BOUNDARY..FaceRotation.STRAIGHT_BOUNDARY &&
+                                rotY in -FaceRotation.STRAIGHT_BOUNDARY..FaceRotation.STRAIGHT_BOUNDARY
+                        -> callBackAnalyzer.onFaceAngleChange(FaceRotation.STRAIGHT)
+                    }
+                }
             }
         }
+    }
+
+    fun close() {
+        faceDetector.close();
     }
 }

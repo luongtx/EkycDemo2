@@ -1,10 +1,7 @@
 package com.example.ekycdemo2
 
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.media.FaceDetector
 import android.os.Bundle
-import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.util.Size
 import android.widget.Toast
@@ -16,26 +13,22 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.ekycdemo2.processor.FaceAnalyzer
+import com.example.ekycdemo2.processor.TTSSpeaker
 import com.example.ekycdemo2.processor.util.FaceRotation
+import com.example.ekycdemo2.processor.util.FaceRotation.Companion.targetFaceRotations
 import com.example.ekycdemo2.utils.Constants
 import com.example.ekycdemo2.utils.Constants.Companion.REQUEST_CODE_PERMISSIONS
 import com.example.ekycdemo2.utils.Constants.Companion.REQUIRED_PERMISSIONS
-import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector
-import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import kotlinx.android.synthetic.main.activity_face_detection.*
-import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kotlin.collections.ArrayList
 
 class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer {
     lateinit var cameraExecutor: ExecutorService
-    lateinit var faceDetector: FirebaseVisionFaceDetector
-    lateinit var targetFaceRotations: ArrayList<Int>
-    lateinit var tts: TextToSpeech
+    lateinit var faceAnalyzer: FaceAnalyzer
+    lateinit var ttsSpeaker: TTSSpeaker
 
-    //lateinit var tv_direct: TextView
+    //lateinit var tfv_direct: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_face_detection)
@@ -48,21 +41,8 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
             )
         }
-
-        //set firebase detector options
-        val realTimeOpts = FirebaseVisionFaceDetectorOptions.Builder()
-            .setContourMode(FirebaseVisionFaceDetectorOptions.ALL_CONTOURS)
-            .build()
-
-        faceDetector = FirebaseVision.getInstance().getVisionFaceDetector(realTimeOpts);
-
-        targetFaceRotations = ArrayList(listOf(FaceRotation.LEFT, FaceRotation.RIGHT, FaceRotation.STRAIGHT))
         tv_direct.text = ("Please turn your face " + FaceRotation.valueOfs[targetFaceRotations.first()])
-
-        tts = TextToSpeech(this) {
-            tts.language = Locale.UK
-            tts.speak(tv_direct.text.toString(), TextToSpeech.QUEUE_FLUSH, null, null)
-        }
+        ttsSpeaker = TTSSpeaker(this, tv_direct.text.toString())
         cameraExecutor = Executors.newSingleThreadExecutor();
     }
 
@@ -79,14 +59,15 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
             val preview = Preview.Builder().build()
                 .also { it.setSurfaceProvider(prv_face_detection.createSurfaceProvider()) }
 
+            faceAnalyzer = FaceAnalyzer()
             val imageAnalysis = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .setTargetResolution(Size(360, 480))
                 .build()
                 .also {
-                    val imageAnalyzer = FaceAnalyzer(faceDetector);
-                    imageAnalyzer.setCallbacks(this)
-                    it.setAnalyzer(cameraExecutor, imageAnalyzer)
+                    faceAnalyzer
+                    faceAnalyzer.setCallbacks(this)
+                    it.setAnalyzer(cameraExecutor, faceAnalyzer)
                 }
 
             val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
@@ -125,7 +106,7 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
 
 
     private fun onDetectionCompleted() {
-        faceDetector.close()
+        faceAnalyzer.close()
         cameraExecutor.shutdown()
         Thread.sleep(1000)
 //        val intent = Intent(this, DetectionResultsActivity::class.java)
@@ -142,10 +123,9 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
                 onDetectionCompleted()
                 return
             }
-            //change direction
             tv_direct.text = if (targetFaceRotations.first() == FaceRotation.STRAIGHT) "Please keep your face straight"
-            else "Please turn your face ${FaceRotation.valueOfs[rotation + 1]}"
-//            tts.speak(tv_direct.text.toString(), TextToSpeech.QUEUE_FLUSH, null, null)
+            else "Please turn your face ${FaceRotation.valueOfs[targetFaceRotations.first()]}"
+            ttsSpeaker.speak(tv_direct.text.toString())
         }
     }
 }
