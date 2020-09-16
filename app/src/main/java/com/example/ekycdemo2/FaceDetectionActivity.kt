@@ -1,5 +1,6 @@
 package com.example.ekycdemo2
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -41,7 +42,8 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
             )
         }
-        tv_direct.text = ("Please turn your face " + FaceRotation.valueOfs[targetFaceRotations.first()])
+        tv_direct.text = (getString(R.string.turn_your_face) + FaceRotation.valueOfs[targetFaceRotations.first()])
+        faceAnalyzer = FaceAnalyzer()
         ttsSpeaker = TTSSpeaker(this, tv_direct.text.toString())
         cameraExecutor = Executors.newSingleThreadExecutor();
     }
@@ -54,12 +56,11 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
         // bind the lifecycle of cameras to the lifecycle owner.
         // This eliminates the task of opening and closing the camera since CameraX is lifecycle-aware.
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-        cameraProviderFuture.addListener(Runnable {
+        cameraProviderFuture.addListener({
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
             val preview = Preview.Builder().build()
                 .also { it.setSurfaceProvider(prv_face_detection.createSurfaceProvider()) }
 
-            faceAnalyzer = FaceAnalyzer()
             val imageAnalysis = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .setTargetResolution(Size(360, 480))
@@ -109,22 +110,22 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
         faceAnalyzer.close()
         cameraExecutor.shutdown()
         Thread.sleep(1000)
-//        val intent = Intent(this, DetectionResultsActivity::class.java)
-//        startActivity(intent)
+        val intent = Intent(this, ResultActivity::class.java)
+        startActivity(intent)
     }
 
 
     override fun onFaceAngleChange(rotation: Int) {
-        tv_rotation.text = ("Rotation: " + FaceRotation.valueOfs[rotation])
+        tv_rotation.text = (getString(R.string.head_is) + FaceRotation.valueOfs[rotation])
         if (rotation == targetFaceRotations.first()) {
             targetFaceRotations.remove(targetFaceRotations.first())
             if (targetFaceRotations.isEmpty()) {
-                tv_direct.text = ("Authentication successfully!")
+                tv_direct.text = (getString(R.string.auth_success))
                 onDetectionCompleted()
                 return
             }
-            tv_direct.text = if (targetFaceRotations.first() == FaceRotation.STRAIGHT) "Please keep your face straight"
-            else "Please turn your face ${FaceRotation.valueOfs[targetFaceRotations.first()]}"
+            tv_direct.text = if (targetFaceRotations.first() == FaceRotation.STRAIGHT) getString(R.string.keep_straight)
+            else "${R.string.turn_your_face} ${FaceRotation.valueOfs[targetFaceRotations.first()]}"
             ttsSpeaker.speak(tv_direct.text.toString())
         }
     }

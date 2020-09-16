@@ -50,6 +50,7 @@ class TextRecognitionActivity : AppCompatActivity(), TextProcessor.CallBackAnaly
             onClickCaptureImage()
         }
         ttsSpeaker = TTSSpeaker(this, tv_text_direct.text.toString())
+        textProcessor = TextProcessor(this)
         cameraExecutor = Executors.newSingleThreadExecutor()
 
     }
@@ -85,7 +86,6 @@ class TextRecognitionActivity : AppCompatActivity(), TextProcessor.CallBackAnaly
             }
             imageCapture = ImageCapture.Builder().build()
             cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-            textProcessor = TextProcessor()
             val imageAnalysis =
                 ImageAnalysis.Builder()
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
@@ -114,7 +114,7 @@ class TextRecognitionActivity : AppCompatActivity(), TextProcessor.CallBackAnaly
 
 
     private fun rebindPreview() {
-        tv_text_direct.text = ("Please show your ID card back")
+        tv_text_direct.text = getString(R.string.show_id_card_back)
         ttsSpeaker.speak(tv_text_direct.text.toString())
         startCamera()
     }
@@ -174,4 +174,12 @@ class TextRecognitionActivity : AppCompatActivity(), TextProcessor.CallBackAnaly
         tv_result.text = texts;
     }
 
+    override fun onCompleted() {
+       onRecognitionCompleted()
+    }
+
+    override fun onRebindPreview() {
+        stopPreview()
+        rebindPreview()
+    }
 }
