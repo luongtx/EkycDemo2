@@ -13,7 +13,7 @@ import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer
 import java.lang.Exception
 
-class TextProcessor(val context: Context) : ImageAnalysis.Analyzer {
+class IDCardProcessor(val context: Context) : ImageAnalysis.Analyzer {
 
     var recognizer: TextRecognizer = TextRecognition.getClient()
     private var idCard: IDCard = IDCard()
@@ -83,8 +83,8 @@ class TextProcessor(val context: Context) : ImageAnalysis.Analyzer {
                     idCard.signedLocation = idCard.signedLocation + reducedLines[6].text.trim()
                     Log.d(TAG, "ID card detected");
                     Log.d(TAG, idCard.toString());
-                    idCard.facing = IDCard.BACK;
                     callBackAnalyzer.onRebindPreview()
+                    idCard.facing = IDCard.BACK;
                 } catch (e: Exception) {
                     e.printStackTrace()
                     return
@@ -109,10 +109,22 @@ class TextProcessor(val context: Context) : ImageAnalysis.Analyzer {
         }
     }
 
+
+    private val sharedPreferenced = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+
     private fun saveIDCard() {
-        val sharedPreferenced = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
         val editor = sharedPreferenced.edit()
         editor.putString("IDCard", idCard.toString())
+        editor.apply()
+    }
+
+    fun saveFilePath(path: String) {
+        val editor = sharedPreferenced.edit()
+        if (idCard.facing == IDCard.FRONT) {
+            editor.putString("id_card_front", path)
+        } else {
+            editor.putString("id_card_back", path)
+        }
         editor.apply()
     }
 

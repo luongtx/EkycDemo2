@@ -1,14 +1,16 @@
 <resources>
     <string name="app_name">EKycDemo2</string>
-    <string name="show_id_card_back">Please show your ID card back</string>
-    <string name="turn_your_face">Please turn your face </string>
+    <string name="show_me_back">Show me the back of your IDCard</string>
+    <string name="turn_your_face">\Move your face \</string>
     <string name="auth_success">Authentication successfully!</string>
-    <string name="head_is">Head is: </string>
-    <string name="keep_straight">Please keep your face straight</string>
+    <string name="head_is">\Head is: \</string>
+    <string name="keep_straight">Keep your face straight</string>
     <string name="verification_result">Verification Result</string>
     <string name="your_contact">CONTACT INFORMATION</string>
     <string name="phone">Phone</string>
     <string name="email">Email</string>
     <string name="confirm">confirm</string>
     <string name="enter_phone_email">Please enter your phone and email</string>
+    <string name="show_me_front">Show me the front of your IDCard</string>
+    <string name="liveness_real_person">Liveness: real person</string>
 </resources>

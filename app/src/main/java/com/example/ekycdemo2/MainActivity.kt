@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, getString(R.string.enter_phone_email), Toast.LENGTH_SHORT).show()
             return
         }
-        val intent = Intent(this, TextRecognitionActivity::class.java)
+        val intent = Intent(this, IDCardScannerActivity::class.java)
         startActivity(intent)
     }
 }

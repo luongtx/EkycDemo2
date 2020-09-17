@@ -15,18 +15,13 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".ResultActivity"></activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name=".ResultActivity" />
         <activity android:name=".FaceDetectionActivity" />
+        <activity android:name=".IDCardScannerActivity" />
         <activity
-                android:name=".TextRecognitionActivity"
+                android:name=".MainActivity"
                 android:exported="true"
                 android:screenOrientation="portrait">
-
-            <!-- <meta-data -->
-            <!-- android:name="com.google.firebase:firebase-ml-vision.DEPENDENCIES" -->
-            <!-- android:value="face"/> -->
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

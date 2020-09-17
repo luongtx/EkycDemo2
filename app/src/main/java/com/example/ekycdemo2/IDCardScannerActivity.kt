@@ -2,36 +2,32 @@ package com.example.ekycdemo2
 
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.util.Size
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.ekycdemo2.processor.TextProcessor
+import com.example.ekycdemo2.processor.IDCardProcessor
 import com.example.ekycdemo2.processor.TTSSpeaker
 import com.example.ekycdemo2.utils.Constants
-import com.example.ekycdemo2.utils.Constants.Companion.FILENAME_FORMAT
 import com.example.ekycdemo2.utils.Constants.Companion.REQUEST_CODE_PERMISSIONS
+import com.example.ekycdemo2.utils.MediaFileIO
 import kotlinx.android.synthetic.main.activity_text_recognition.*
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 
-class TextRecognitionActivity : AppCompatActivity(), TextProcessor.CallBackAnalyzer {
+class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnalyzer {
     private lateinit var cameraExecutor: ExecutorService
     private var imageCapture: ImageCapture? = null
     private lateinit var preview: Preview
     private lateinit var cameraSelector: CameraSelector
-    private lateinit var outputDirectory: File
     lateinit var cameraProvider: ProcessCameraProvider
-    lateinit var textProcessor: TextProcessor
+    lateinit var idCardProcessor: IDCardProcessor
     lateinit var ttsSpeaker: TTSSpeaker
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,13 +40,9 @@ class TextRecognitionActivity : AppCompatActivity(), TextProcessor.CallBackAnaly
                 this, Constants.REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
             )
         }
-        outputDirectory = getOutputDirectory()
 
-        btnCapture.setOnClickListener {
-            onClickCaptureImage()
-        }
-        ttsSpeaker = TTSSpeaker(this, tv_text_direct.text.toString())
-        textProcessor = TextProcessor(this)
+        ttsSpeaker = TTSSpeaker(this, Constants.speechText["front"]!!);
+        idCardProcessor = IDCardProcessor(this)
         cameraExecutor = Executors.newSingleThreadExecutor()
 
     }
@@ -84,16 +76,16 @@ class TextRecognitionActivity : AppCompatActivity(), TextProcessor.CallBackAnaly
             preview = Preview.Builder().build().also {
                 it.setSurfaceProvider(prv_text_recognition.createSurfaceProvider())
             }
-            imageCapture = ImageCapture.Builder().build()
+            imageCapture = ImageCapture.Builder().setTargetResolution(Size(400, 300)).build()
             cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
             val imageAnalysis =
                 ImageAnalysis.Builder()
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                     .build()
                     .also {
-                        textProcessor
-                        textProcessor.setCallbacks(this)
-                        it.setAnalyzer(cameraExecutor, textProcessor)
+                        idCardProcessor
+                        idCardProcessor.setCallbacks(this)
+                        it.setAnalyzer(cameraExecutor, idCardProcessor)
                     }
             try {
                 cameraProvider.unbindAll()
@@ -104,18 +96,10 @@ class TextRecognitionActivity : AppCompatActivity(), TextProcessor.CallBackAnaly
         }, ContextCompat.getMainExecutor(this))
     }
 
-    private fun getOutputDirectory(): File {
-        val mediaDir = externalMediaDirs.firstOrNull()?.let {
-            File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
-        }
-        return if (mediaDir != null && mediaDir.exists())
-            mediaDir else filesDir
-    }
-
-
     private fun rebindPreview() {
-        tv_text_direct.text = getString(R.string.show_id_card_back)
-        ttsSpeaker.speak(tv_text_direct.text.toString())
+        stopPreview()
+        tv_text_direct.text = getString(R.string.show_me_back)
+        ttsSpeaker.speak(Constants.speechText["back"] ?: error(""))
         startCamera()
     }
 
@@ -124,22 +108,13 @@ class TextRecognitionActivity : AppCompatActivity(), TextProcessor.CallBackAnaly
         Thread.sleep(1000)
     }
 
-    var times: Int = 1
-    private fun onClickCaptureImage() {
+    private fun captureImage(isRebind: Boolean) {
         val imageCapture = imageCapture ?: return
-
         // Create time-stamped output file to hold the image
-        val photoFile = File(
-            outputDirectory,
-            SimpleDateFormat(
-                FILENAME_FORMAT, Locale.US
-            ).format(System.currentTimeMillis()) + ".jpg"
-        )
-
+        val photoFile = MediaFileIO.createMediaFile(this)
+        idCardProcessor.saveFilePath(photoFile.absolutePath);
         // Create output options object which contains file + metadata
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
-
-
         // Set up image capture listener, which is triggered after photo has
         // been taken
         imageCapture.takePicture(
@@ -149,23 +124,23 @@ class TextRecognitionActivity : AppCompatActivity(), TextProcessor.CallBackAnaly
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    val savedUri = Uri.fromFile(photoFile)
-                    val msg = "Photo capture succeeded: $savedUri"
-                    Toast.makeText(baseContext, msg, Toast.LENGTH_LONG).show()
-                    Log.d(Constants.TAG, msg)
-                    stopPreview()
-                    if (times++ == 2) {
-                        onRecognitionCompleted()
-                        return
+//                    Toast.makeText(baseContext, "Photo capture succeeded ", Toast.LENGTH_LONG).show()
+                    if (isRebind) rebindPreview()
+                    else {
+                        stopAll()
+                        nextStep()
                     }
-                    rebindPreview()
                 }
             })
     }
 
-    private fun onRecognitionCompleted() {
+    private fun stopAll() {
         cameraExecutor.shutdown()
-        textProcessor.close()
+        idCardProcessor.close()
+        Thread.sleep(1000)
+    }
+
+    private fun nextStep() {
         val intent = Intent(this, FaceDetectionActivity::class.java)
         startActivity(intent)
     }
@@ -175,11 +150,10 @@ class TextRecognitionActivity : AppCompatActivity(), TextProcessor.CallBackAnaly
     }
 
     override fun onCompleted() {
-       onRecognitionCompleted()
+        captureImage(false)
     }
 
     override fun onRebindPreview() {
-        stopPreview()
-        rebindPreview()
+        captureImage(true)
     }
 }

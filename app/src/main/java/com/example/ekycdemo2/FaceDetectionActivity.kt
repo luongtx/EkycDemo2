@@ -1,25 +1,21 @@
 package com.example.ekycdemo2
 
+import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.util.Size
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.ekycdemo2.processor.FaceAnalyzer
 import com.example.ekycdemo2.processor.TTSSpeaker
 import com.example.ekycdemo2.processor.util.FaceRotation
 import com.example.ekycdemo2.processor.util.FaceRotation.Companion.targetFaceRotations
 import com.example.ekycdemo2.utils.Constants
-import com.example.ekycdemo2.utils.Constants.Companion.REQUEST_CODE_PERMISSIONS
-import com.example.ekycdemo2.utils.Constants.Companion.REQUIRED_PERMISSIONS
+import com.example.ekycdemo2.utils.MediaFileIO
 import kotlinx.android.synthetic.main.activity_face_detection.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -28,28 +24,20 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
     lateinit var cameraExecutor: ExecutorService
     lateinit var faceAnalyzer: FaceAnalyzer
     lateinit var ttsSpeaker: TTSSpeaker
+    private var imageCapture: ImageCapture? = null
 
     //lateinit var tfv_direct: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_face_detection)
 
-        //request permission
-        if (allPermissionsGranted()) {
-            startCamera();
-        } else {
-            ActivityCompat.requestPermissions(
-                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
-            )
-        }
-        tv_direct.text = (getString(R.string.turn_your_face) + FaceRotation.valueOfs[targetFaceRotations.first()])
-        faceAnalyzer = FaceAnalyzer()
-        ttsSpeaker = TTSSpeaker(this, tv_direct.text.toString())
-        cameraExecutor = Executors.newSingleThreadExecutor();
-    }
+        startCamera();
 
-    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-        ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
+        val rotation = FaceRotation.valueOfs[targetFaceRotations.first()];
+        tv_direct.text = (getString(R.string.turn_your_face) + rotation)
+        faceAnalyzer = FaceAnalyzer()
+        ttsSpeaker = TTSSpeaker(this, Constants.speechText[rotation]!!)
+        cameraExecutor = Executors.newSingleThreadExecutor();
     }
 
     private fun startCamera() {
@@ -61,6 +49,7 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
             val preview = Preview.Builder().build()
                 .also { it.setSurfaceProvider(prv_face_detection.createSurfaceProvider()) }
 
+            imageCapture = ImageCapture.Builder().setTargetResolution(Size(400, 300)).build()
             val imageAnalysis = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .setTargetResolution(Size(360, 480))
@@ -78,6 +67,7 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
                     this,
                     cameraSelector,
                     preview,
+                    imageCapture,
                     imageAnalysis
                 )
             } catch (e: Exception) {
@@ -87,33 +77,50 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
 
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults:
-        IntArray
-    ) {
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (allPermissionsGranted()) {
-                startCamera()
-            } else {
-                Toast.makeText(
-                    this,
-                    "Permissions not granted by the user.",
-                    Toast.LENGTH_SHORT
-                ).show()
-                finish()
-            }
-        }
+    private fun captureImage() {
+        val imageCapture = imageCapture ?: return
+        // Create time-stamped output file to hold the image
+        val photoFile = MediaFileIO.createMediaFile(this)
+        saveFilePath(photoFile.absolutePath)
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+        imageCapture.takePicture(
+            outputOptions, ContextCompat.getMainExecutor(this), object : ImageCapture.OnImageSavedCallback {
+                override fun onError(exc: ImageCaptureException) {
+                    Log.e(Constants.TAG, "Photo capture failed: ${exc.message}", exc)
+                }
+
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+//                    Toast.makeText(baseContext, "Photo capture succeeded ", Toast.LENGTH_LONG).show()
+                    stopAll()
+                    nextStep()
+                }
+            })
     }
 
+    private fun saveFilePath(path: String) {
+        val sharedPreferenced = getSharedPreferences("prefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferenced.edit()
+        editor.putString("img_face", path)
+        editor.apply()
+    }
 
-    private fun onDetectionCompleted() {
+    @JvmName("getOutputDirectory1")
+
+    private fun stopAll() {
+        Thread.sleep(1000)
         faceAnalyzer.close()
         cameraExecutor.shutdown()
-        Thread.sleep(1000)
+    }
+
+    private fun nextStep() {
         val intent = Intent(this, ResultActivity::class.java)
         startActivity(intent)
     }
 
+    private fun onDetectionCompleted() {
+        faceAnalyzer.close()
+        captureImage()
+    }
 
     override fun onFaceAngleChange(rotation: Int) {
         tv_rotation.text = (getString(R.string.head_is) + FaceRotation.valueOfs[rotation])
@@ -124,9 +131,11 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
                 onDetectionCompleted()
                 return
             }
+            Thread.sleep(1000)
+            val rotNext = FaceRotation.valueOfs[targetFaceRotations.first()]
             tv_direct.text = if (targetFaceRotations.first() == FaceRotation.STRAIGHT) getString(R.string.keep_straight)
-            else "${R.string.turn_your_face} ${FaceRotation.valueOfs[targetFaceRotations.first()]}"
-            ttsSpeaker.speak(tv_direct.text.toString())
+            else "${getString(R.string.turn_your_face)} $rotNext"
+            ttsSpeaker.speak(Constants.speechText[rotNext]!!)
         }
     }
 }
