@@ -5,7 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.util.Size
-import android.widget.Toast
+import android.view.View
+import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -19,6 +20,7 @@ import com.example.ekycdemo2.utils.MediaFileIO
 import kotlinx.android.synthetic.main.activity_face_detection.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+
 
 class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer {
     lateinit var cameraExecutor: ExecutorService
@@ -118,25 +120,29 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
     }
 
     private fun onDetectionCompleted() {
+        iv_check.visibility = View.VISIBLE
+        tv_direct.text = (getString(R.string.auth_success))
         faceAnalyzer.close()
         captureImage()
     }
 
     override fun onFaceAngleChange(rotation: Int) {
         tv_rotation.text = (getString(R.string.head_is) + FaceRotation.valueOfs[rotation])
-        if (rotation == targetFaceRotations.first()) {
-            targetFaceRotations.remove(targetFaceRotations.first())
+        if (rotation == targetFaceRotations[0]) {
+            targetFaceRotations.removeAt(0)
             if (targetFaceRotations.isEmpty()) {
-                tv_direct.text = (getString(R.string.auth_success))
                 onDetectionCompleted()
                 return
             }
-            Thread.sleep(1000)
-            val rotNext = FaceRotation.valueOfs[targetFaceRotations.first()]
-            tv_direct.text = if (targetFaceRotations.first() == FaceRotation.STRAIGHT) getString(R.string.keep_straight)
-            else "${getString(R.string.turn_your_face)} $rotNext"
-            ttsSpeaker.speak(Constants.speechText[rotNext]!!)
+            nextDirection()
         }
+    }
+
+    private fun nextDirection() {
+        val rotNext = FaceRotation.valueOfs[targetFaceRotations.first()]
+        tv_direct.text = if (targetFaceRotations.first() == FaceRotation.STRAIGHT) getString(R.string.keep_straight)
+        else "${getString(R.string.turn_your_face)} $rotNext"
+        ttsSpeaker.speak(Constants.speechText[rotNext]!!)
     }
 }
 

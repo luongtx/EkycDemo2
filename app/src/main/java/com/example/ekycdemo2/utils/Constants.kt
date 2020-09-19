@@ -7,6 +7,7 @@ class Constants {
         const val REQUEST_CODE_PERMISSIONS = 10
         val REQUIRED_PERMISSIONS = arrayOf(android.Manifest.permission.CAMERA);
         val speechText = mapOf(
+            "scanned_success" to " Your ID Card has been successfully scanned, please move to next step",
             "front" to "Please show me the front of your IDCard",
             "back" to "Please show me the back of your IDCard",
             "up" to "Please move your face up",

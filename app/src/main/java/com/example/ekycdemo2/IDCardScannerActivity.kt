@@ -2,9 +2,11 @@ package com.example.ekycdemo2
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.util.Size
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
@@ -128,7 +130,6 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
                     if (isRebind) rebindPreview()
                     else {
                         stopAll()
-                        nextStep()
                     }
                 }
             })
@@ -137,10 +138,13 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
     private fun stopAll() {
         cameraExecutor.shutdown()
         idCardProcessor.close()
-        Thread.sleep(1000)
+        ttsSpeaker.speak(Constants.speechText["scanned_success"]!!);
+        btn_next_step.visibility = View.VISIBLE
+        btn_next_step.setOnClickListener { nextStep() }
     }
 
     private fun nextStep() {
+//        tvStep.text = (getString(R.string.next_step_face_detection))
         val intent = Intent(this, FaceDetectionActivity::class.java)
         startActivity(intent)
     }

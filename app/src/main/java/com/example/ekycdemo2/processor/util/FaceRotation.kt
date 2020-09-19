@@ -10,6 +10,6 @@ class FaceRotation {
         val valueOfs = mapOf(STRAIGHT to "straight", LEFT to "left", UP to "up", DOWN to "down", RIGHT to "right")
         const val ANGLE = 40
         const val STRAIGHT_BOUNDARY = 5.0
-        val targetFaceRotations = ArrayList(listOf(LEFT, RIGHT, UP, DOWN, STRAIGHT))
+        val targetFaceRotations = ArrayList(listOf(LEFT, RIGHT, DOWN, STRAIGHT))
     }
 }
