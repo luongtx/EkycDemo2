@@ -7,6 +7,9 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.example.ekycdemo2.model.IDCard
 import com.example.ekycdemo2.utils.Constants.Companion.TAG
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
@@ -69,7 +72,6 @@ class IDCardProcessor(val context: Context) : ImageAnalysis.Analyzer {
                 }
                 if (idCard.id != null) {
                     reducedLines = lines.subList(lines.indexOf(line) + 1, lines.lastIndex + 1);
-
                     break
                 };
             }
@@ -110,16 +112,16 @@ class IDCardProcessor(val context: Context) : ImageAnalysis.Analyzer {
     }
 
 
-    private val sharedPreferenced = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+    private val sharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
 
     private fun saveIDCard() {
-        val editor = sharedPreferenced.edit()
-        editor.putString("IDCard", idCard.toString())
-        editor.apply()
+        val mDatabaseReference = Firebase.database.reference
+        val userPN = sharedPreferences.getString("phone", "")
+        mDatabaseReference.child("id_cards").child(userPN!!).setValue(idCard)
     }
 
     fun saveFilePath(path: String) {
-        val editor = sharedPreferenced.edit()
+        val editor = sharedPreferences.edit()
         if (idCard.facing == IDCard.FRONT) {
             editor.putString("id_card_front", path)
         } else {

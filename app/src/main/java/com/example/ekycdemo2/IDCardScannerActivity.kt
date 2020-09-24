@@ -13,11 +13,15 @@ import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.ekycdemo2.model.IDCard
 import com.example.ekycdemo2.processor.IDCardProcessor
 import com.example.ekycdemo2.processor.TTSSpeaker
 import com.example.ekycdemo2.utils.Constants
 import com.example.ekycdemo2.utils.Constants.Companion.REQUEST_CODE_PERMISSIONS
 import com.example.ekycdemo2.utils.MediaFileIO
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_text_recognition.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -160,4 +164,6 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
     override fun onRebindPreview() {
         captureImage(true)
     }
+
+
 }

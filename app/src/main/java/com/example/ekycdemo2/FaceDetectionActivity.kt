@@ -43,8 +43,6 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
     }
 
     private fun startCamera() {
-        // bind the lifecycle of cameras to the lifecycle owner.
-        // This eliminates the task of opening and closing the camera since CameraX is lifecycle-aware.
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
@@ -92,7 +90,6 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-//                    Toast.makeText(baseContext, "Photo capture succeeded ", Toast.LENGTH_LONG).show()
                     stopAll()
                     nextStep()
                 }
