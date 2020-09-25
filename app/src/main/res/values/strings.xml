@@ -1,21 +1,18 @@
 <resources>
     <string name="app_name">EKycDemo2</string>
-    <string name="show_me_back">Show me the back of your IDCard</string>
-    <string name="turn_your_face">\Move your face \</string>
-    <string name="auth_success">Authentication successfully!</string>
-    <string name="head_is">\Head is: \</string>
-    <string name="keep_straight">Keep your face straight</string>
-    <string name="verification_result">Verification Result</string>
-    <string name="your_contact">CONTACT INFORMATION</string>
-    <string name="phone">Phone</string>
+    <string name="show_me_back">Xuất trình mặt sau CMND</string>
+    <string name="auth_success">Xác thực thành công!</string>
+    <string name="head_is">\Quay: \</string>
+    <string name="verification_result">Kết quả xác thực</string>
+    <string name="your_contact">THÔNG TIN CÁ NHÂN</string>
+    <string name="phone">Điện thoại</string>
     <string name="email">Email</string>
-    <string name="confirm">confirm</string>
-    <string name="enter_phone_email">Please enter your phone and email</string>
-    <string name="show_me_front">Show me the front of your IDCard</string>
-    <string name="liveness_real_person">Liveness: real person</string>
-    <string name="step_2_3">Step 2/3</string>
-    <string name="step_1_3">Step 1/3</string>
-    <string name="next_step_face_detection">Next step: \Face Detection</string>
-    <string name="result_text">Result text</string>
-    <string name="wrong_direction">Wrong direction!</string>
+    <string name="confirm">xác nhận</string>
+    <string name="enter_phone_email">Vui lòng nhập</string>
+    <string name="show_me_front">Xuất trình mặt trước CMND</string>
+    <string name="liveness_real_person">Trạng thái: real person</string>
+    <string name="step_2_3">Bước 2/3</string>
+    <string name="step_1_3">Bước 1/3</string>
+    <string name="next_step_face_detection">Bước tiếp theo: \Face Detection</string>
+    <string name="result_text">Kết quả</string>
 </resources>

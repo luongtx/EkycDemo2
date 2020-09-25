@@ -2,14 +2,20 @@ package com.example.ekycdemo2.processor.util
 
 class FaceRotation {
     companion object {
-        const val STRAIGHT = 0
-        const val LEFT = 1
-        const val RIGHT = 2
-        const val UP = 3
-        const val DOWN = 4
-        val valueOfs = mapOf(STRAIGHT to "straight", LEFT to "left", UP to "up", DOWN to "down", RIGHT to "right")
+        const val STRAIGHT = "thẳng"
+        const val LEFT = "trái"
+        const val RIGHT = "phải"
+        const val UP = "trên"
+        const val DOWN = "dưới"
+        val directionOf = mapOf(
+            STRAIGHT to "Nhìn thẳng vào camera",
+            LEFT to "Quay mặt sang trái",
+            UP to "Quay mặt lên trên",
+            DOWN to "Quay mặt xuống dưới",
+            RIGHT to "Quay mặt sang phải"
+        )
         const val ANGLE = 40
         const val STRAIGHT_BOUNDARY = 5.0
-        val targetFaceRotations = ArrayList(listOf(LEFT, RIGHT, DOWN, STRAIGHT))
+        val targetFaceRotations = ArrayList(listOf(LEFT, RIGHT, DOWN, STRAIGHT, UP).shuffled())
     }
 }

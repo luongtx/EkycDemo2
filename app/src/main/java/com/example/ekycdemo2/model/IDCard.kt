@@ -9,22 +9,22 @@ class IDCard {
     var feature: String? = null
     var issueDate: String? = null
     var issueLocation: String? = null
-    var facing: Int? = 1;
+    var facing: String? = "FRONT";
     override fun toString(): String {
         return "IDCard {" +
-                "\n id= " + id +
-                "\n name= '" + name + '\'' +
-                "\n birthDay= " + birthDay +
-                "\n location= '" + location + '\'' +
-                "\n signedLocation= '" + signedLocation + '\'' +
-                "\n feature= '" + feature + '\'' +
-                "\n issueDate= '" + issueDate + '\'' +
-                "\n issueLocation= '" + issueLocation + '\'' +
+                "\n ID= " + id +
+                "\n Tên= '" + name + '\'' +
+                "\n Ngày sinh= " + birthDay +
+                "\n Nguyên quán= '" + location + '\'' +
+                "\n Nơi ĐKHK thường trú= '" + signedLocation + '\'' +
+                "\n Đặc điểm nhận dạng= '" + feature + '\'' +
+                "\n Ngày đăng ký= '" + issueDate + '\'' +
+                "\n Nơi đăng ký= '" + issueLocation + '\'' +
                 "\n}"
     }
 
     companion object {
-        const val FRONT = 1;
-        const val BACK = 2;
+        const val FRONT = "FRONT";
+        const val BACK = "BACK";
     }
 }

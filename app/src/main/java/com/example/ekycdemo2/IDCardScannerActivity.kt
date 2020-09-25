@@ -2,7 +2,6 @@ package com.example.ekycdemo2
 
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.util.Size
@@ -19,9 +18,6 @@ import com.example.ekycdemo2.processor.TTSSpeaker
 import com.example.ekycdemo2.utils.Constants
 import com.example.ekycdemo2.utils.Constants.Companion.REQUEST_CODE_PERMISSIONS
 import com.example.ekycdemo2.utils.MediaFileIO
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_text_recognition.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -47,7 +43,7 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
             )
         }
 
-        ttsSpeaker = TTSSpeaker(this, Constants.speechText["front"]!!);
+        ttsSpeaker = TTSSpeaker(this, Constants.speechText[IDCard.FRONT] ?: error(""));
         idCardProcessor = IDCardProcessor(this)
         cameraExecutor = Executors.newSingleThreadExecutor()
 
@@ -105,7 +101,7 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
     private fun rebindPreview() {
         stopPreview()
         tv_text_direct.text = getString(R.string.show_me_back)
-        ttsSpeaker.speak(Constants.speechText["back"] ?: error(""))
+        ttsSpeaker.speak(Constants.speechText[IDCard.BACK] ?: error(""))
         startCamera()
     }
 
@@ -118,7 +114,6 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
         val imageCapture = imageCapture ?: return
         // Create time-stamped output file to hold the image
         val photoFile = MediaFileIO.createMediaFile(this)
-        idCardProcessor.saveFilePath(photoFile.absolutePath);
         // Create output options object which contains file + metadata
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
         // Set up image capture listener, which is triggered after photo has
@@ -131,6 +126,7 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
 //                    Toast.makeText(baseContext, "Photo capture succeeded ", Toast.LENGTH_LONG).show()
+                    idCardProcessor.saveFilePath(photoFile.absolutePath);
                     if (isRebind) rebindPreview()
                     else {
                         stopAll()
@@ -140,9 +136,10 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
     }
 
     private fun stopAll() {
+        stopPreview()
         cameraExecutor.shutdown()
         idCardProcessor.close()
-        ttsSpeaker.speak(Constants.speechText["scanned_success"]!!);
+//        ttsSpeaker.speak(Constants.speechText["scanned_success"]!!);
         btn_next_step.visibility = View.VISIBLE
         btn_next_step.setOnClickListener { nextStep() }
     }

@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.util.Log
 import android.util.Size
 import android.view.View
-import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -35,10 +34,10 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
 
         startCamera();
 
-        val rotation = FaceRotation.valueOfs[targetFaceRotations.first()];
-        tv_direct.text = (getString(R.string.turn_your_face) + rotation)
+        val direct = FaceRotation.directionOf[targetFaceRotations.first()];
+        tv_direct.text = direct
         faceAnalyzer = FaceAnalyzer()
-        ttsSpeaker = TTSSpeaker(this, Constants.speechText[rotation]!!)
+        ttsSpeaker = TTSSpeaker(this, Constants.speechText[targetFaceRotations.first()] ?: error(""))
         cameraExecutor = Executors.newSingleThreadExecutor();
     }
 
@@ -90,8 +89,7 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    stopAll()
-                    nextStep()
+                    Log.d(Constants.TAG, "Photo was captured!")
                 }
             })
     }
@@ -119,13 +117,14 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
     private fun onDetectionCompleted() {
         iv_check.visibility = View.VISIBLE
         tv_direct.text = (getString(R.string.auth_success))
-        faceAnalyzer.close()
-        captureImage()
+        stopAll()
+        nextStep()
     }
 
-    override fun onFaceAngleChange(rotation: Int) {
-        tv_rotation.text = (getString(R.string.head_is) + FaceRotation.valueOfs[rotation])
+    override fun onFaceAngleChange(rotation: String) {
+        tv_rotation.text = rotation
         if (rotation == targetFaceRotations[0]) {
+            if (rotation == FaceRotation.STRAIGHT) captureImage()
             targetFaceRotations.removeAt(0)
             if (targetFaceRotations.isEmpty()) {
                 onDetectionCompleted()
@@ -136,10 +135,8 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
     }
 
     private fun nextDirection() {
-        val rotNext = FaceRotation.valueOfs[targetFaceRotations.first()]
-        tv_direct.text = if (targetFaceRotations.first() == FaceRotation.STRAIGHT) getString(R.string.keep_straight)
-        else "${getString(R.string.turn_your_face)} $rotNext"
-        ttsSpeaker.speak(Constants.speechText[rotNext]!!)
+        tv_direct.text = FaceRotation.directionOf[targetFaceRotations.first()]
+        ttsSpeaker.speak(Constants.speechText[targetFaceRotations.first()] ?: error(""))
     }
 }
 

@@ -7,7 +7,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
 
-class TTSSpeaker(private val context: Context, private val textToSpeak: String) {
+class TTSSpeaker(context: Context, private val textToSpeak: String) {
     lateinit var tts: TextToSpeech
 
     init {
