@@ -9,7 +9,6 @@ import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetector
 import com.google.mlkit.vision.face.FaceDetectorOptions
-import kotlinx.coroutines.delay
 
 
 class FaceAnalyzer : ImageAnalysis.Analyzer {
@@ -45,7 +44,7 @@ class FaceAnalyzer : ImageAnalysis.Analyzer {
             // ...
             faceDetector.process(image)
                 .addOnSuccessListener { faces ->
-                    processListFace(faces)
+                    processResults(faces)
                     imageProxy.close()
 //                    Thread.sleep(100)
                 }
@@ -56,7 +55,7 @@ class FaceAnalyzer : ImageAnalysis.Analyzer {
         }
     }
 
-    private fun processListFace(faces: List<Face>) {
+    private fun processResults(faces: List<Face>) {
         for (face in faces) {
             val rotY = face.headEulerAngleY
             val rotX = face.headEulerAngleX

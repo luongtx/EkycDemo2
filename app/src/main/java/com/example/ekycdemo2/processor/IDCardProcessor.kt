@@ -5,9 +5,10 @@ import android.content.Context
 import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import com.example.ekycdemo2.IDCardScannerActivity.Companion.idCard
 import com.example.ekycdemo2.model.IDCard
 import com.example.ekycdemo2.utils.Constants.Companion.TAG
-import com.google.firebase.database.DatabaseReference
+import com.example.ekycdemo2.utils.MediaFileIO
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.mlkit.vision.common.InputImage
@@ -19,12 +20,10 @@ import java.lang.Exception
 class IDCardProcessor(val context: Context) : ImageAnalysis.Analyzer {
 
     var recognizer: TextRecognizer = TextRecognition.getClient()
-    private var idCard: IDCard = IDCard()
 
     interface CallBackAnalyzer {
         fun onTextResults(texts: String)
-        fun onCompleted()
-        fun onRebindPreview()
+        fun onProcessed()
     }
 
     private lateinit var callBackAnalyzer: CallBackAnalyzer
@@ -40,7 +39,7 @@ class IDCardProcessor(val context: Context) : ImageAnalysis.Analyzer {
             val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
             recognizer.process(image)
                 .addOnSuccessListener { texts ->
-                    processTextRecognitionResult(texts)
+                    processResults(texts)
                     imageProxy.close()
                 }.addOnFailureListener { e ->
                     e.printStackTrace()
@@ -49,7 +48,7 @@ class IDCardProcessor(val context: Context) : ImageAnalysis.Analyzer {
         }
     }
 
-    private fun processTextRecognitionResult(texts: Text) {
+    private fun processResults(texts: Text) {
         callBackAnalyzer.onTextResults(texts.text)
         Log.d(TAG, texts.text)
         val blocks = texts.textBlocks
@@ -61,7 +60,7 @@ class IDCardProcessor(val context: Context) : ImageAnalysis.Analyzer {
 
     private fun process(lines: List<Text.Line>) {
         var reducedLines: List<Text.Line> = ArrayList();
-        if (idCard.facing == IDCard.FRONT) {
+        if (idCard.storePaths.isEmpty()) {
             for (line in lines) {
                 val elements = line.elements;
                 for (element in elements) {
@@ -85,8 +84,7 @@ class IDCardProcessor(val context: Context) : ImageAnalysis.Analyzer {
                     idCard.signedLocation = idCard.signedLocation + reducedLines[6].text.trim()
                     Log.d(TAG, "ID card detected");
                     Log.d(TAG, idCard.toString());
-                    callBackAnalyzer.onRebindPreview()
-                    idCard.facing = IDCard.BACK;
+                    callBackAnalyzer.onProcessed()
                 } catch (e: Exception) {
                     e.printStackTrace()
                     return
@@ -100,8 +98,7 @@ class IDCardProcessor(val context: Context) : ImageAnalysis.Analyzer {
                         idCard.feature = reducedLines[0].text + " " + reducedLines[1].text;
                         idCard.issueDate = reducedLines[2].text.trim()
                         idCard.issueLocation = reducedLines[3].text.substring(9);
-                        saveIDCard();
-                        callBackAnalyzer.onCompleted()
+                        callBackAnalyzer.onProcessed()
                     } catch (e: Exception) {
                         e.printStackTrace()
                         return
@@ -111,24 +108,6 @@ class IDCardProcessor(val context: Context) : ImageAnalysis.Analyzer {
         }
     }
 
-
-    private val sharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
-
-    private fun saveIDCard() {
-        val mDatabaseReference = Firebase.database.reference
-        val userPN = sharedPreferences.getString("phone", "")
-        mDatabaseReference.child("id_cards").child(userPN!!).setValue(idCard)
-    }
-
-    fun saveFilePath(path: String) {
-        val editor = sharedPreferences.edit()
-        if (idCard.facing == IDCard.FRONT) {
-            editor.putString("id_card_front", path)
-        } else {
-            editor.putString("id_card_back", path)
-        }
-        editor.apply()
-    }
 
     fun close() {
         recognizer.close()

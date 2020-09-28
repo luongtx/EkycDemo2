@@ -1,5 +1,8 @@
 package com.example.ekycdemo2.model
 
+import android.net.Uri
+import java.util.*
+
 class IDCard {
     var id: Int? = null
     var name: String? = null
@@ -9,7 +12,7 @@ class IDCard {
     var feature: String? = null
     var issueDate: String? = null
     var issueLocation: String? = null
-    var facing: String? = "FRONT";
+    var storePaths = ArrayList<String>(2)
     override fun toString(): String {
         return "IDCard {" +
                 "\n ID= " + id +
@@ -24,7 +27,7 @@ class IDCard {
     }
 
     companion object {
-        const val FRONT = "FRONT";
-        const val BACK = "BACK";
+        const val FRONT = 0;
+        const val BACK = 1;
     }
 }

@@ -11,14 +11,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:elevation="5dp"
             android:text="@string/head_is"
             android:textColor="@android:color/holo_red_light"
-            android:textSize="20sp"
+            android:textSize="15sp"
             app:layout_constraintLeft_toLeftOf="@id/prv_face_detection"
             app:layout_constraintLeft_toRightOf="@id/prv_face_detection"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@id/prv_face_detection" />
 
     <TextView
             android:id="@+id/tv_direct"
@@ -37,7 +37,7 @@
             android:id="@+id/prv_face_detection"
             android:layout_width="350dp"
             android:layout_height="350dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="30dp"
             android:background="@drawable/stroke_border"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -49,7 +49,7 @@
             android:layout_height="wrap_content"
             android:background="@android:color/darker_gray"
             android:gravity="center"
-            android:text="@string/step_2_3"
+            android:text="@string/step_3_3"
             android:textColor="@android:color/black"
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent" />
@@ -58,7 +58,6 @@
             android:id="@+id/iv_check"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:contentDescription="iv_check"
             android:src="@drawable/ic_check_blue"
             android:visibility="invisible"
             app:layout_constraintBottom_toTopOf="@+id/tvStep"
