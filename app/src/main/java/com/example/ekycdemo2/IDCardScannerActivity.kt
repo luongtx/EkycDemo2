@@ -1,5 +1,6 @@
 package com.example.ekycdemo2
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -15,9 +16,12 @@ import androidx.core.content.ContextCompat
 import com.example.ekycdemo2.model.IDCard
 import com.example.ekycdemo2.processor.IDCardProcessor
 import com.example.ekycdemo2.processor.TTSSpeaker
+import com.example.ekycdemo2.repos.impl.IDCardRepoImpl
 import com.example.ekycdemo2.utils.Constants
 import com.example.ekycdemo2.utils.Constants.Companion.REQUEST_CODE_PERMISSIONS
 import com.example.ekycdemo2.utils.MediaFileIO
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_text_recognition.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -31,6 +35,11 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
     lateinit var cameraProvider: ProcessCameraProvider
     lateinit var idCardProcessor: IDCardProcessor
     lateinit var ttsSpeaker: TTSSpeaker
+
+    companion object {
+        var idCard: IDCard = IDCard();
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_text_recognition)
@@ -110,7 +119,7 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
         Thread.sleep(1000)
     }
 
-    private fun captureImage(isRebind: Boolean) {
+    private fun captureImage() {
         val imageCapture = imageCapture ?: return
         // Create time-stamped output file to hold the image
         val photoFile = MediaFileIO.createMediaFile(this)
@@ -125,10 +134,14 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-//                    Toast.makeText(baseContext, "Photo capture succeeded ", Toast.LENGTH_LONG).show()
-                    idCardProcessor.saveFilePath(photoFile.absolutePath);
-                    if (isRebind) rebindPreview()
-                    else {
+                    Toast.makeText(baseContext, "Photo capture succeeded ", Toast.LENGTH_LONG).show()
+                    if (idCard.storePaths.isEmpty()) {
+                        idCard.storePaths.add(photoFile.absolutePath)
+                        rebindPreview()
+                    } else {
+                        idCard.storePaths.add(photoFile.absolutePath)
+                        val idCardRepo = IDCardRepoImpl(this@IDCardScannerActivity)
+                        idCardRepo.saveIDCard(idCard)
                         stopAll()
                     }
                 }
@@ -139,13 +152,11 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
         stopPreview()
         cameraExecutor.shutdown()
         idCardProcessor.close()
-//        ttsSpeaker.speak(Constants.speechText["scanned_success"]!!);
         btn_next_step.visibility = View.VISIBLE
         btn_next_step.setOnClickListener { nextStep() }
     }
 
     private fun nextStep() {
-//        tvStep.text = (getString(R.string.next_step_face_detection))
         val intent = Intent(this, FaceDetectionActivity::class.java)
         startActivity(intent)
     }
@@ -154,13 +165,8 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
         tv_result.text = texts;
     }
 
-    override fun onCompleted() {
-        captureImage(false)
+    override fun onProcessed() {
+        captureImage()
     }
-
-    override fun onRebindPreview() {
-        captureImage(true)
-    }
-
 
 }

@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             android:background="@android:color/darker_gray"
             android:gravity="center"
-            android:text="@string/step_1_3"
+            android:text="@string/step_2_3"
             android:textColor="@android:color/black"
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent" />

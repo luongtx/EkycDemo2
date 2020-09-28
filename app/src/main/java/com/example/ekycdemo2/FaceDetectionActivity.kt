@@ -37,7 +37,8 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
         val direct = FaceRotation.directionOf[targetFaceRotations.first()];
         tv_direct.text = direct
         faceAnalyzer = FaceAnalyzer()
-        ttsSpeaker = TTSSpeaker(this, Constants.speechText[targetFaceRotations.first()] ?: error(""))
+        ttsSpeaker =
+            TTSSpeaker(this, Constants.speechText[targetFaceRotations.first()] ?: error(""))
         cameraExecutor = Executors.newSingleThreadExecutor();
     }
 
@@ -80,23 +81,25 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
         val imageCapture = imageCapture ?: return
         // Create time-stamped output file to hold the image
         val photoFile = MediaFileIO.createMediaFile(this)
-        saveFilePath(photoFile.absolutePath)
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
         imageCapture.takePicture(
-            outputOptions, ContextCompat.getMainExecutor(this), object : ImageCapture.OnImageSavedCallback {
+            outputOptions,
+            ContextCompat.getMainExecutor(this),
+            object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
                     Log.e(Constants.TAG, "Photo capture failed: ${exc.message}", exc)
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                    saveFilePath(photoFile.absolutePath)
                     Log.d(Constants.TAG, "Photo was captured!")
                 }
             })
     }
 
     private fun saveFilePath(path: String) {
-        val sharedPreferenced = getSharedPreferences("prefs", Context.MODE_PRIVATE)
-        val editor = sharedPreferenced.edit()
+        val sharedReferenced = getSharedPreferences("prefs", Context.MODE_PRIVATE)
+        val editor = sharedReferenced.edit()
         editor.putString("img_face", path)
         editor.apply()
     }
@@ -122,7 +125,7 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
     }
 
     override fun onFaceAngleChange(rotation: String) {
-        tv_rotation.text = rotation
+        tv_rotation.text = (getString(R.string.head_is) + rotation)
         if (rotation == targetFaceRotations[0]) {
             if (rotation == FaceRotation.STRAIGHT) captureImage()
             targetFaceRotations.removeAt(0)

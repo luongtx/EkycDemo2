@@ -19,5 +19,6 @@ class Constants {
             FaceRotation.LEFT to "Please move your face to the left",
             FaceRotation.RIGHT to "Please move your face to the right"
         )
+        const val ROOT_NODE = "id_cards"
     }
 }
