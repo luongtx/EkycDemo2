@@ -48,15 +48,4 @@
                 android:text="@string/confirm" />
     </LinearLayout>
 
-    <TextView
-            android:id="@+id/tvStep"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/darker_gray"
-            android:gravity="center"
-            android:text="@string/step_1_3"
-            android:textColor="@android:color/black"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

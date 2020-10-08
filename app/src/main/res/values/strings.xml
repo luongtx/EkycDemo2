@@ -16,4 +16,10 @@
     <string name="step_1_3">Bước 1/3</string>
     <string name="next_step_face_detection">Bước tiếp theo: \Face Detection</string>
     <string name="result_text">Kết quả</string>
+    <string name="id_card">CMND</string>
+    <string name="driver">Bằng lái xe</string>
+    <string name="passport">Hộ chiếu</string>
+    <string name="enter_full_name">Nhập họ tên:</string>
+    <string name="doc_type">Loại hồ sơ:</string>
+    <string name="cont">Tiếp tục</string>
 </resources>

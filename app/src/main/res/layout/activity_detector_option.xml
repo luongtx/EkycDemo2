@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimaryLight"
+        android:orientation="vertical">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        <LinearLayout
+                android:id="@+id/layout0"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp">
+
+            <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/enter_full_name"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="20sp" />
+
+            <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+        </LinearLayout>
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/doc_type"
+                android:textSize="25sp" />
+
+        <LinearLayout
+                android:id="@+id/layout1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:background="@drawable/stroke_border"
+                android:padding="7dp">
+
+            <ImageView
+                    android:id="@+id/iv_card"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/id_card" />
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="30dp"
+                    android:text="@string/id_card"
+                    android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:id="@+id/layout2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:background="@drawable/stroke_border"
+                android:padding="7dp">
+
+            <ImageView
+                    android:id="@+id/iv_driver"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/driver_license" />
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="30dp"
+                    android:text="@string/driver"
+                    android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:id="@+id/layout3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:background="@drawable/stroke_border"
+                android:padding="7dp">
+
+            <ImageView
+                    android:id="@+id/iv_passport"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/passport" />
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="30dp"
+                    android:text="@string/passport"
+                    android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:background="@color/colorPrimaryDark"
+                android:elevation="10dp"
+                android:text="@string/cont" />
+    </LinearLayout>
+
+
+    <TextView
+            android:id="@+id/tvStep"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@android:color/darker_gray"
+            android:gravity="center"
+            android:text="@string/step_1_3"
+            android:textColor="@android:color/black"
+            android:textSize="20sp" />
+
+</FrameLayout>
