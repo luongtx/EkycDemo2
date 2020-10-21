@@ -19,7 +19,7 @@
     <string name="id_card">CMND</string>
     <string name="driver">Bằng lái xe</string>
     <string name="passport">Hộ chiếu</string>
-    <string name="enter_full_name">Nhập họ tên:</string>
-    <string name="doc_type">Loại hồ sơ:</string>
+    <string name="enter_full_name">Nhập họ tên</string>
+    <string name="doc_type">Chọn loại hồ sơ</string>
     <string name="cont">Tiếp tục</string>
 </resources>

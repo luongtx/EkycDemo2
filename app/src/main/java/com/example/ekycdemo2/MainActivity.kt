@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         saveData();
-        val intent = Intent(this, IDCardScannerActivity::class.java)
+        val intent = Intent(this, ActivityDetectorOption::class.java)
         startActivity(intent)
     }
 
