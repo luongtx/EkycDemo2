@@ -20,6 +20,8 @@ class Constants {
             FaceRotation.RIGHT to "Please move your face to the right"
         )
         const val ROOT_NODE = "id_cards"
+        var userPN = "1232134"
+        const val API_ENDPOINT = "http://203.171.20.92:5001/api/id-extraction"
     }
 }
 

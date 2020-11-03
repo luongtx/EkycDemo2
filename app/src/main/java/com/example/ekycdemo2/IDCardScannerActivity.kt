@@ -1,6 +1,5 @@
 package com.example.ekycdemo2
 
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -16,14 +15,11 @@ import androidx.core.content.ContextCompat
 import com.example.ekycdemo2.model.IDCard
 import com.example.ekycdemo2.processor.IDCardProcessor
 import com.example.ekycdemo2.processor.TTSSpeaker
-import com.example.ekycdemo2.repos.impl.IDCardRepoImpl
+import com.example.ekycdemo2.utils.OCRService
 import com.example.ekycdemo2.utils.Constants
 import com.example.ekycdemo2.utils.Constants.Companion.REQUEST_CODE_PERMISSIONS
 import com.example.ekycdemo2.utils.MediaFileIO
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_text_recognition.*
-import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -111,7 +107,7 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
             } catch (e: Exception) {
                 Log.e(Constants.TAG, "Use case binding failed", e)
             }
-        },  ContextCompat.getMainExecutor(this))
+        }, ContextCompat.getMainExecutor(this))
     }
 
     private fun rebindPreview() {
@@ -145,20 +141,18 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     Toast.makeText(baseContext, "Photo capture succeeded ", Toast.LENGTH_LONG)
                         .show()
-                    if (idCard.storePaths.isEmpty()) {
-                        idCard.storePaths.add(photoFile.absolutePath)
+                    if (idCard.storedFiles.isEmpty()) {
+                        idCard.storedFiles.add(photoFile)
                         rebindPreview()
                     } else {
-                        idCard.storePaths.add(photoFile.absolutePath)
-                        val idCardRepo = IDCardRepoImpl(this@IDCardScannerActivity)
-                        idCardRepo.saveIDCard(idCard)
-                        stopAll()
+                        idCard.storedFiles.add(photoFile)
+                        onPreProcessCompleted()
                     }
                 }
             })
     }
 
-    private fun stopAll() {
+    private fun onPreProcessCompleted() {
         stopPreview()
         cameraExecutor.shutdown()
         idCardProcessor.close()
@@ -166,7 +160,13 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
         btn_next_step.setOnClickListener { nextStep() }
     }
 
+    private fun startIDCardExtraction() {
+        val intent = Intent(this, OCRService::class.java);
+        startService(intent);
+    }
+
     private fun nextStep() {
+        startIDCardExtraction();
         val intent = Intent(this, FaceDetectionActivity::class.java)
         startActivity(intent)
     }

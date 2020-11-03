@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.example.ekycdemo2.utils.Constants
+import com.example.ekycdemo2.utils.Constants.Companion.userPN
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuth
@@ -22,14 +23,13 @@ class OTPAuthentication : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_otp_authentication)
-        val phoneNumber = intent.getStringExtra("phone");
-        sendOTP(phoneNumber)
-        btn_confirm.setOnClickListener(View.OnClickListener {
+        sendOTP(userPN)
+        btn_confirm.setOnClickListener {
             val userCode = etOTP.text.toString();
             if (userCode.isNotEmpty()) {
                 verifyUserCode(userCode);
             }
-        })
+        }
     }
 
     private fun verifyUserCode(userCode: String) {

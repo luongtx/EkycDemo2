@@ -1,5 +1,6 @@
 package com.example.ekycdemo2.model
 
+import com.google.firebase.database.Exclude
 import com.google.gson.annotations.SerializedName
 import java.io.File
 import java.util.*
@@ -34,9 +35,14 @@ class IDCard {
     private val identityImage: String? = null
 
     @SerializedName("embeddings")
+
     private val embeddings: List<Int>? = null
+
     var issueLocation: String? = null
-    var storeFiles = ArrayList<File>(2)
+
+    @get:Exclude
+    var storedFiles = ArrayList<File>(2)
+
     override fun toString(): String {
         return "IDCard {" +
                 "\n ID= " + id +
@@ -54,7 +60,7 @@ class IDCard {
     }
 
     fun extract(idCard: IDCard) {
-        if (id == null) {
+        if (!idCard.id.isNullOrEmpty()) {
             id = idCard.id;
             name = idCard.name;
             birthDay = idCard.birthDay;
@@ -66,7 +72,5 @@ class IDCard {
         }
     }
 
-    fun isCompletedDetection(): Boolean {
-        return storeFiles.size == 2;
-    }
+    var signedDate = "$issueDate/$issueMonth/$issueYear";
 }

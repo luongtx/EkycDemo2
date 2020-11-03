@@ -6,8 +6,10 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.ekycdemo2.utils.Constants
 import com.example.ekycdemo2.utils.Constants.Companion.ROOT_NODE
 import com.example.ekycdemo2.utils.Constants.Companion.TAG
+import com.example.ekycdemo2.utils.Constants.Companion.userPN
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -33,17 +35,11 @@ class MainActivity : AppCompatActivity() {
             return
         }
         saveData();
-        val intent = Intent(this, OTPAuthentication::class.java)
-        intent.putExtra("phone", et_phone.text.toString());
-        startActivity(intent)
+        startActivity(Intent(this, OTPAuthentication::class.java));
     }
 
     private fun saveData() {
-        val mPreferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
-        val editor = mPreferences.edit()
-        val userPN = et_phone.text.toString()
-        editor.putString("phone", userPN)
-        editor.apply()
+        userPN = et_phone.text.toString();
         val mFirebaseReference = Firebase.database.reference
         mFirebaseReference.child(ROOT_NODE).child(userPN).push()
     }
