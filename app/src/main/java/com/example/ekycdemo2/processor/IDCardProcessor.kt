@@ -54,22 +54,18 @@ class IDCardProcessor(val context: Context) : ImageAnalysis.Analyzer {
     }
 
     private fun process(lines: List<Text.Line>) {
-        var reducedLines: List<Text.Line> = ArrayList();
         if (idCard.storedFiles.isEmpty()) {
+            var check1 = false;
+            var check2 = false;
             for (line in lines) {
-                val elements = line.elements;
-                for (element in elements) {
-                    if (element.text.matches(Regex("\\d{9}"))) {
-                        idCard.id = element.text;
-                        break;
-                    }
+                if (line.text.contains(Regex("\\d{9}"))) {
+                    check1 = true;
                 }
-                if (idCard.id != null) {
-                    reducedLines = lines.subList(lines.indexOf(line) + 1, lines.lastIndex + 1);
-                    break
-                };
+                if (line.text.contains("DKHK")) {
+                    check2 = true;
+                }
             }
-            if (reducedLines.isNotEmpty()) {
+            if (check1 && check2) {
                 try {
                     Log.d(TAG, "ID card detected");
                     callBackAnalyzer.onProcessed()
