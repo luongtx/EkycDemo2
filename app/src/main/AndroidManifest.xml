@@ -22,9 +22,9 @@
         <activity android:name=".ActivityDetectorOption" />
         <activity android:name=".ResultActivity" />
         <activity android:name=".FaceDetectionActivity" />
-        <activity android:name=".MainActivity" />
+        <activity android:name=".IDCardScannerActivity" />
         <activity
-                android:name=".IDCardScannerActivity"
+                android:name=".MainActivity"
                 android:exported="true"
                 android:screenOrientation="portrait">
             <intent-filter>

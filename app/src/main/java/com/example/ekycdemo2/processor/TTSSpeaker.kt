@@ -2,9 +2,6 @@ package com.example.ekycdemo2.processor
 
 import android.content.Context
 import android.speech.tts.TextToSpeech
-import kotlinx.android.synthetic.main.activity_face_detection.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.util.*
 
 class TTSSpeaker(context: Context, private val textToSpeak: String) {
