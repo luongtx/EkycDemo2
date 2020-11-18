@@ -17,7 +17,6 @@ class IDCardProcessor(val context: Context) : ImageAnalysis.Analyzer {
     var recognizer: TextRecognizer = TextRecognition.getClient()
 
     interface CallBackAnalyzer {
-        fun onTextResults(texts: String)
         fun onProcessed()
     }
 
@@ -44,7 +43,6 @@ class IDCardProcessor(val context: Context) : ImageAnalysis.Analyzer {
     }
 
     private fun processResults(texts: Text) {
-        callBackAnalyzer.onTextResults(texts.text)
         Log.d(TAG, texts.text)
         val blocks = texts.textBlocks
         if (blocks.size > 0) {

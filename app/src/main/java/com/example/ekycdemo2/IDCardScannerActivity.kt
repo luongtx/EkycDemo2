@@ -171,10 +171,6 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
         startActivity(intent)
     }
 
-    override fun onTextResults(texts: String) {
-        tv_result.text = texts;
-    }
-
     override fun onProcessed() {
         captureImage()
     }

@@ -17,13 +17,13 @@ class IDCard {
     var birthDay: String? = null
 
     @SerializedName("add")
-    var location: String? = null
+    var address: String? = null
 
-    var signedLocation: String? = null
+    var signedAdd: String? = null
     var feature: String? = null
 
     @SerializedName("date")
-    var issueDate: String? = null
+    var issuedDay: String? = null
 
     @SerializedName("month")
     var issueMonth: String? = null;
@@ -38,7 +38,7 @@ class IDCard {
 
     private val embeddings: List<Int>? = null
 
-    var issueLocation: String? = null
+    var issuedAdd: String? = null
 
     @get:Exclude
     var storedFiles = ArrayList<File>(2)
@@ -48,9 +48,9 @@ class IDCard {
                 "\n ID= " + id +
                 "\n Tên= '" + name + '\'' +
                 "\n Ngày sinh= " + birthDay +
-                "\n Nguyên quán= '" + location + '\'' +
-                "\n Nơi ĐKHK thường trú= '" + location + '\'' +
-                "\n Ngày đăng ký= '" + issueDate + "/" + issueMonth + "/" + issueYear + '\'' +
+                "\n Nguyên quán= '" + address + '\'' +
+                "\n Nơi ĐKHK thường trú= '" + address + '\'' +
+                "\n Ngày đăng ký= '" + issuedDay + "/" + issueMonth + "/" + issueYear + '\'' +
                 "\n}"
     }
 
@@ -64,13 +64,13 @@ class IDCard {
             id = idCard.id;
             name = idCard.name;
             birthDay = idCard.birthDay;
-            location = idCard.location;
+            address = idCard.address;
         } else {
-            issueDate = idCard.issueDate;
+            issuedDay = idCard.issuedDay;
             issueMonth = idCard.issueMonth;
             issueYear = idCard.issueYear;
         }
     }
 
-    var signedDate = "$issueDate/$issueMonth/$issueYear";
+    var issuedDate = "$issuedDay/$issueMonth/$issueYear";
 }
