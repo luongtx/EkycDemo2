@@ -1,9 +1,8 @@
 package com.example.ekycdemo2.repos.impl
 
-import android.content.Context
 import android.util.Log
 import com.example.ekycdemo2.model.IDCard
-import com.example.ekycdemo2.repos.IDCardRepo
+import com.example.ekycdemo2.repos.IDCardRepository
 import com.example.ekycdemo2.utils.Constants.Companion.ROOT_NODE
 import com.example.ekycdemo2.utils.Constants.Companion.TAG
 import com.example.ekycdemo2.utils.Constants.Companion.userPN
@@ -14,7 +13,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 
-class IDCardRepoImpl : IDCardRepo {
+class IDCardRepositoryImpl : IDCardRepository {
 
     interface DataCallback {
         fun onCallback(idCard: IDCard);
@@ -22,6 +21,7 @@ class IDCardRepoImpl : IDCardRepo {
 
     override fun saveIDCard(idCard: IDCard) {
         val mDatabaseReference = Firebase.database.reference
+        mDatabaseReference.child(ROOT_NODE).child(userPN).push()
         mDatabaseReference.child(ROOT_NODE).child(userPN).setValue(idCard)
         Log.d(TAG, "save id card successfully!")
     }

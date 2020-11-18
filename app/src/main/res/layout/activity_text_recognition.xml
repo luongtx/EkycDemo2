@@ -34,7 +34,7 @@
             android:layout_marginTop="20dp"
             android:layout_marginBottom="10dp"
             android:gravity="center"
-            android:text="@string/show_me_front"
+            android:text="@string/cap_front"
             android:textColor="@android:color/holo_green_dark"
             android:textSize="20sp"
             app:layout_constraintTop_toBottomOf="@+id/cardView" />

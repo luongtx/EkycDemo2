@@ -6,8 +6,6 @@ import android.os.IBinder
 import android.util.Log
 import com.example.ekycdemo2.IDCardScannerActivity.Companion.idCard
 import com.example.ekycdemo2.model.OCRResults
-import com.example.ekycdemo2.repos.IDCardRepo
-import com.example.ekycdemo2.repos.impl.IDCardRepoImpl
 import com.example.ekycdemo2.utils.Constants.Companion.API_ENDPOINT
 import com.google.gson.Gson
 import okhttp3.*
@@ -19,10 +17,8 @@ import java.io.IOException
 class OCRService : Service() {
     private var isRunning = false
     private lateinit var backgroundThread: Thread
-    private lateinit var idCardRepo: IDCardRepo;
 
     private val IDCardExtractor = Runnable {
-        idCardRepo = IDCardRepoImpl();
         extractIDCard(idCard.storedFiles[0]);
     }
 
@@ -78,7 +74,6 @@ class OCRService : Service() {
                     if (result.id != null) {
                         extractIDCard(idCard.storedFiles[1]);
                     } else {
-                        idCardRepo.saveIDCard(idCard);
                         stopSelf();
                     }
                 } catch (e: Exception) {

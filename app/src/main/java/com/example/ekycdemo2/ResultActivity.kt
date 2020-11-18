@@ -8,7 +8,7 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import cn.pedant.SweetAlert.SweetAlertDialog
 import com.example.ekycdemo2.IDCardScannerActivity.Companion.idCard
-import com.example.ekycdemo2.repos.impl.IDCardRepoImpl
+import com.example.ekycdemo2.repos.impl.IDCardRepositoryImpl
 import com.example.ekycdemo2.utils.Constants
 import kotlinx.android.synthetic.main.activity_result.*
 import java.io.File
@@ -58,8 +58,8 @@ class ResultActivity : AppCompatActivity() {
         idCard.issuedDate = tvIssuedDate.text.toString();
         idCard.issuedAdd = tvIssuedAdd.text.toString();
         disableAll();
-        val idCardRepo = IDCardRepoImpl();
-        idCardRepo.saveIDCard(idCard);
+        val idCardRepository = IDCardRepositoryImpl();
+        idCardRepository.saveIDCard(idCard);
         SweetAlertDialog(
             this, SweetAlertDialog.SUCCESS_TYPE
         )

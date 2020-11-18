@@ -11,7 +11,6 @@ import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import com.example.ekycdemo2.processor.FaceAnalyzer
-import com.example.ekycdemo2.processor.TTSSpeaker
 import com.example.ekycdemo2.processor.util.FaceRotation
 import com.example.ekycdemo2.processor.util.FaceRotation.Companion.targetFaceRotations
 import com.example.ekycdemo2.utils.Constants
@@ -24,7 +23,8 @@ import java.util.concurrent.Executors
 class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer {
     lateinit var cameraExecutor: ExecutorService
     lateinit var faceAnalyzer: FaceAnalyzer
-    lateinit var ttsSpeaker: TTSSpeaker
+
+    //    lateinit var ttsSpeaker: TTSSpeaker
     private var imageCapture: ImageCapture? = null
 
     //lateinit var tfv_direct: TextView
@@ -37,8 +37,8 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
         val direct = FaceRotation.directionOf[targetFaceRotations.first()];
         tv_direct.text = direct
         faceAnalyzer = FaceAnalyzer()
-        ttsSpeaker =
-            TTSSpeaker(this, Constants.speechText[targetFaceRotations.first()] ?: error(""))
+//        ttsSpeaker =
+//            TTSSpeaker(this, Constants.speechText[targetFaceRotations.first()] ?: error(""))
         cameraExecutor = Executors.newSingleThreadExecutor();
     }
 
@@ -139,7 +139,7 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
 
     private fun nextDirection() {
         tv_direct.text = FaceRotation.directionOf[targetFaceRotations.first()]
-        ttsSpeaker.speak(Constants.speechText[targetFaceRotations.first()] ?: error(""))
+//        ttsSpeaker.speak(Constants.speechText[targetFaceRotations.first()] ?: error(""))
     }
 }
 

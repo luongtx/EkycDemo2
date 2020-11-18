@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">EKycDemo2</string>
+    <string name="show_me_front">Xuất trình mặt trước CMND</string>
     <string name="show_me_back">Xuất trình mặt sau CMND</string>
     <string name="auth_success">Xác thực thành công!</string>
     <string name="head_is">\Head is: \</string>
@@ -9,7 +10,6 @@
     <string name="email">Email</string>
     <string name="confirm">xác nhận</string>
     <string name="enter_phone_email">Vui lòng nhập</string>
-    <string name="show_me_front">Xuất trình mặt trước CMND</string>
     <string name="liveness_real_person">Trạng thái: real person</string>
     <string name="step_3_3">Bước 3/3</string>
     <string name="step_2_3">Bước 2/3</string>
@@ -34,4 +34,6 @@
     <string name="flash_on">Bật đèn</string>
     <string name="off">OFF</string>
     <string name="on">ON</string>
+    <string name="cap_front">Chụp mặt trước CMND</string>
+    <string name="cap_back">Chụp mặt sau CMND</string>
 </resources>
