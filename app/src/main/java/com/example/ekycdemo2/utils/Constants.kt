@@ -6,7 +6,7 @@ import com.example.ekycdemo2.processor.util.FaceRotation
 class Constants {
     companion object {
         const val TAG = "CameraXBasic"
-        const val NETWORK = "network"
+        const val NETWORK = "NETWORK"
         const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         const val REQUEST_CODE_PERMISSIONS = 10
         val REQUIRED_PERMISSIONS = arrayOf(android.Manifest.permission.CAMERA);
@@ -22,8 +22,12 @@ class Constants {
         )
         const val ROOT_NODE = "id_cards"
         var userPN = "1232134"
-        const val API_ENDPOINT = "https://app.nanonets.com/api/v2/OCR/Model/b0206bad-d4f0-4c55-9a76-5b49e0cd2dc4/LabelFile/"
+        const val API_ENDPOINT =
+            "https://app.nanonets.com/api/v2/OCR/Model/b0206bad-d4f0-4c55-9a76-5b49e0cd2dc4/LabelFile/"
         const val AUTH_HEADER = "Basic azBtY1hXNWpEcEo2U25oeTVtUmQ1bk83TzJUbjJWWUI6"
+
+        const val I_WIDTH = 400;
+        const val I_HEIGHT = 300;
     }
 }
 

@@ -1,5 +1,6 @@
 package com.example.ekycdemo2
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.hardware.camera2.CameraAccessException
@@ -16,10 +17,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import cn.pedant.SweetAlert.SweetAlertDialog
 import com.example.ekycdemo2.model.IDCard
 import com.example.ekycdemo2.model.OCRResults
 import com.example.ekycdemo2.processor.IDCardProcessor
 import com.example.ekycdemo2.utils.Constants
+import com.example.ekycdemo2.utils.Constants.Companion.I_HEIGHT
+import com.example.ekycdemo2.utils.Constants.Companion.I_WIDTH
 import com.example.ekycdemo2.utils.MediaFileIO
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_text_recognition.*
@@ -40,10 +44,11 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
     private lateinit var cameraSelector: CameraSelector
     private var cameraProvider: ProcessCameraProvider? = null
     lateinit var idCardProcessor: IDCardProcessor
+    lateinit var progressDialog: ProgressDialog;
 //    lateinit var ttsSpeaker: TTSSpeaker
 
 
-    private lateinit var client: OkHttpClient;
+    private lateinit var httpClient: OkHttpClient;
 
     companion object {
         var idCard: IDCard = IDCard();
@@ -90,7 +95,8 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
                 }
             }
         }
-        client = OkHttpClient().newBuilder()
+
+        httpClient = OkHttpClient().newBuilder()
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
@@ -105,7 +111,7 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
             preview = Preview.Builder().build().also {
                 it.setSurfaceProvider(prv_text_recognition.createSurfaceProvider())
             }
-            imageCapture = ImageCapture.Builder().setTargetResolution(Size(400, 300)).build()
+            imageCapture = ImageCapture.Builder().setTargetResolution(Size(I_WIDTH, I_HEIGHT)).build()
             cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
             if (auto) {
                 val imageAnalysis =
@@ -157,10 +163,6 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
         startCamera(auto);
     }
 
-//    private fun stopPreview() {
-//        cameraProvider.unbindAll();
-//        Thread.sleep(1000)
-//    }
 
     private fun captureImage(auto: Boolean) {
         val imageCapture = imageCapture ?: return
@@ -181,28 +183,14 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     Toast.makeText(baseContext, "Photo capture succeeded ", Toast.LENGTH_LONG)
                         .show()
-                    if (idCard.storedFiles.isEmpty()) {
-                        idCard.storedFiles.add(photoFile)
-                        rebindPreview(auto)
-                    } else {
-                        idCard.storedFiles.add(photoFile)
-                        onPreProcessCompleted()
-                    }
+                    cameraProvider?.unbindAll();
+                    idCard.storedFiles.add(photoFile);
+                    extractIDCard(photoFile, auto);
                 }
             })
     }
 
-    private fun onPreProcessCompleted() {
-        cameraProvider?.unbindAll();
-        cameraExecutor.shutdown()
-        idCardProcessor.close()
-        extractIDCard(idCard.storedFiles[0]);
-        extractIDCard(idCard.storedFiles[1]);
-    }
-
-
-    private fun extractIDCard(file: File) {
-        "image/jpeg".toMediaTypeOrNull()
+    private fun extractIDCard(file: File, auto: Boolean) {
         val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
             .addFormDataPart(
                 "file", file.name,
@@ -216,42 +204,56 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
             .addHeader("Authorization", Constants.AUTH_HEADER)
             .build()
 
-        client.newCall(request).enqueue(object : Callback {
+        httpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
+                progressDialog.dismiss();
 
+                Log.d(Constants.NETWORK, e.message.toString());
             }
 
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
-                    try {
-                        runOnUiThread {
-                            if (response.isSuccessful) {
-                                try {
-                                    val predictions = Gson().fromJson(
-                                        response.body?.string(),
-                                        OCRResults::class.java
-                                    ).result[0].predictions;
-                                    idCard.extract(predictions);
-                                    if (idCard.isFilled) nextStep();
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                }
-                            } else {
-                                Log.d(Constants.NETWORK, response.message);
-                            }
+                    runOnUiThread {
+                        try {
+                            val predictions = Gson().fromJson(
+                                response.body?.string(),
+                                OCRResults::class.java
+                            ).result[0].predictions;
+                            progressDialog.dismiss();
+                            idCard.extract(predictions);
+                            if (idCard.isFilled) onProcessCompleted();
+                            else rebindPreview(auto);
+                        } catch (e: Exception) {
+                            idCard.onExtractError();
+                            showErrorDialog();
+                            startCamera(auto);
                         }
-
-                    } catch (e: Exception) {
-                        e.printStackTrace()
                     }
                 } else {
                     Log.d(Constants.NETWORK, response.message);
                 }
             }
         })
+        showProgressDialog();
     }
 
-    private fun nextStep() {
+    private fun showProgressDialog() {
+        progressDialog = ProgressDialog(this)
+        progressDialog.setMessage("Đang xử lý...")
+        progressDialog.show()
+    }
+
+    private fun showErrorDialog() {
+        SweetAlertDialog(
+            this@IDCardScannerActivity, SweetAlertDialog.ERROR_TYPE
+        )
+            .setTitleText("Oops...")
+            .setContentText("Đã xảy ra lỗi, vui lòng thử lại!")
+            .show()
+    }
+
+    private fun onProcessCompleted() {
+        cameraExecutor.shutdown()
         val intent = Intent(this, FaceDetectionActivity::class.java)
         startActivity(intent)
     }

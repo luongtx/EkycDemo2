@@ -43,7 +43,7 @@ class IDCardProcessor(val context: Context) : ImageAnalysis.Analyzer {
     }
 
     private fun processResults(texts: Text) {
-        Log.d(TAG, texts.text)
+//        Log.d(TAG, texts.text)
         val blocks = texts.textBlocks
         if (blocks.size > 0) {
             val lines = blocks.flatMap { block -> block.lines }

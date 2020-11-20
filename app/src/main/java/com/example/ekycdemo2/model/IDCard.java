@@ -1,5 +1,8 @@
 package com.example.ekycdemo2.model;
 
+import android.util.Log;
+
+import com.example.ekycdemo2.utils.Constants;
 import com.google.firebase.database.Exclude;
 
 import java.io.File;
@@ -91,8 +94,8 @@ public class IDCard {
         this.storedFiles = storedFiles;
     }
 
-    public void extract(List<Prediction> predictions) {
-        if (id == null) {
+    public void extract(List<Prediction> predictions) throws IndexOutOfBoundsException {
+        if (storedFiles.size() == 1) {
             id = predictions.get(0).getOcrText();
             name = predictions.get(1).getOcrText();
             dob = predictions.get(2).getOcrText();
@@ -104,7 +107,11 @@ public class IDCard {
     }
 
     public boolean isFilled() {
-        return (id != null) && (issuedDate != null);
+        return (storedFiles.size() == 2);
+    }
+
+    public void onExtractError() {
+        storedFiles.remove(storedFiles.size() - 1);
     }
 
 }

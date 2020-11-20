@@ -31,6 +31,9 @@ class OTPAuthentication : AppCompatActivity() {
         }
     }
 
+
+    private lateinit var verifyCodeBySystem: String
+
     private fun verifyUserCode(userCode: String) {
         val phoneAuthCredential = PhoneAuthProvider.getCredential(verifyCodeBySystem, userCode);
         signInWithPhoneAuthCredential(phoneAuthCredential);
@@ -45,9 +48,6 @@ class OTPAuthentication : AppCompatActivity() {
             callbacks
         ) // OnVerificationStateChangedCallbacks
     }
-
-    private lateinit var verifyCodeBySystem: String
-
 
     private val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
@@ -98,6 +98,7 @@ class OTPAuthentication : AppCompatActivity() {
 
     private fun signInWithPhoneAuthCredential(credential: PhoneAuthCredential) {
         val firebaseAuth = FirebaseAuth.getInstance();
+        firebaseAuth.setLanguageCode("vi");
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener {
             if (it.isSuccessful) {
                 startActivity(Intent(this, ActivityDocumentOption::class.java));
