@@ -22,7 +22,7 @@ class ResultActivity : AppCompatActivity() {
             img_card_front.setImageURI(Uri.fromFile(idCard.storedFiles[0]))
             img_card_back.setImageURI(Uri.fromFile(idCard.storedFiles[1]))
         } catch (e: Exception) {
-            Log.d(Constants.TAG, e.message);
+            Log.d(Constants.TAG, e.message.toString());
         }
         val sharedReferenced = getSharedPreferences("prefs", MODE_PRIVATE)
         val pathFace = sharedReferenced.getString("img_face", "")
