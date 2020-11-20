@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         saveData();
         //request permission
         if (allPermissionsGranted()) {
-            startActivity(Intent(this, ActivityDocumentOption::class.java));
+            startActivity(Intent(this, OTPAuthentication::class.java));
         } else {
             ActivityCompat.requestPermissions(
                 this, Constants.REQUIRED_PERMISSIONS, Constants.REQUEST_CODE_PERMISSIONS

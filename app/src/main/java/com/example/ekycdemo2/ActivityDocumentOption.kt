@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_detector_option.*
+import kotlinx.android.synthetic.main.activity_document_option.*
 
 class ActivityDocumentOption : AppCompatActivity() {
     enum class DocumentType {
@@ -14,7 +14,7 @@ class ActivityDocumentOption : AppCompatActivity() {
     var documentType: DocumentType? = null;
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_detector_option)
+        setContentView(R.layout.activity_document_option)
         btnCont.setOnClickListener { onBtnClick() };
         layout1.setOnClickListener {
             layout1.isActivated = true;

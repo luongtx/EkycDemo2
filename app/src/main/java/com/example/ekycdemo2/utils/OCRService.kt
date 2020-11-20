@@ -27,6 +27,8 @@ class OCRService : Service() {
         extractIDCard(idCard.storedFiles[0]);
     }
 
+    private lateinit var client: OkHttpClient;
+
     override fun onCreate() {
         super.onCreate()
         this.isRunning = false;
@@ -49,9 +51,6 @@ class OCRService : Service() {
         }
         return START_NOT_STICKY;
     }
-
-
-    private lateinit var client: OkHttpClient;
 
     private fun extractIDCard(file: File) {
         "image/jpeg".toMediaTypeOrNull()

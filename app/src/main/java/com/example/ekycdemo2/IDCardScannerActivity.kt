@@ -17,13 +17,20 @@ import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import com.example.ekycdemo2.model.IDCard
+import com.example.ekycdemo2.model.OCRResults
 import com.example.ekycdemo2.processor.IDCardProcessor
 import com.example.ekycdemo2.utils.Constants
 import com.example.ekycdemo2.utils.MediaFileIO
-import com.example.ekycdemo2.utils.OCRService
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_text_recognition.*
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
+import java.io.IOException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 
 class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnalyzer {
@@ -34,6 +41,9 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
     private var cameraProvider: ProcessCameraProvider? = null
     lateinit var idCardProcessor: IDCardProcessor
 //    lateinit var ttsSpeaker: TTSSpeaker
+
+
+    private lateinit var client: OkHttpClient;
 
     companion object {
         var idCard: IDCard = IDCard();
@@ -80,6 +90,11 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
                 }
             }
         }
+        client = OkHttpClient().newBuilder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build();
 
     }
 
@@ -181,14 +196,59 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
         cameraProvider?.unbindAll();
         cameraExecutor.shutdown()
         idCardProcessor.close()
-        btn_next_step.visibility = View.VISIBLE
-        startIDCardExtraction();
-        btn_next_step.setOnClickListener { nextStep() }
+        extractIDCard(idCard.storedFiles[0]);
+        extractIDCard(idCard.storedFiles[1]);
     }
 
-    private fun startIDCardExtraction() {
-        val intent = Intent(this, OCRService::class.java);
-        startService(intent);
+
+    private fun extractIDCard(file: File) {
+        "image/jpeg".toMediaTypeOrNull()
+        val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
+            .addFormDataPart(
+                "file", file.name,
+                File(file.absolutePath)
+                    .asRequestBody("application/octet-stream".toMediaTypeOrNull())
+            )
+            .build()
+        val request = Request.Builder()
+            .url(Constants.API_ENDPOINT)
+            .method("POST", body)
+            .addHeader("Authorization", Constants.AUTH_HEADER)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    try {
+                        runOnUiThread {
+                            if (response.isSuccessful) {
+                                try {
+                                    val predictions = Gson().fromJson(
+                                        response.body?.string(),
+                                        OCRResults::class.java
+                                    ).result[0].predictions;
+                                    idCard.extract(predictions);
+                                    if (idCard.isFilled) nextStep();
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            } else {
+                                Log.d(Constants.NETWORK, response.message);
+                            }
+                        }
+
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                } else {
+                    Log.d(Constants.NETWORK, response.message);
+                }
+            }
+        })
     }
 
     private fun nextStep() {

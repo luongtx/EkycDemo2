@@ -24,6 +24,7 @@ public class IDCard {
     public IDCard() {
 
     }
+
     public IDCard(String id, String name, String dob, String address, String issuedDate, String issuedAddress) {
         this.id = id;
         this.name = name;
@@ -91,7 +92,7 @@ public class IDCard {
     }
 
     public void extract(List<Prediction> predictions) {
-        if(id == null) {
+        if (id == null) {
             id = predictions.get(0).getOcrText();
             name = predictions.get(1).getOcrText();
             dob = predictions.get(2).getOcrText();
@@ -100,6 +101,10 @@ public class IDCard {
             issuedDate = predictions.get(0).getOcrText();
             issuedAddress = predictions.get(1).getOcrText();
         }
+    }
+
+    public boolean isFilled() {
+        return (id != null) && (issuedDate != null);
     }
 
 }

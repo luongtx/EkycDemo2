@@ -19,7 +19,7 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:replace="android:icon">
-        <service android:name=".utils.OCRService" />
+<!--        <service android:name=".utils.OCRService" />-->
 
         <activity android:name=".OTPAuthentication" />
         <activity android:name=".ActivityDocumentOption" />
