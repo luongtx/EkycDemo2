@@ -34,10 +34,10 @@ class ResultActivity : AppCompatActivity() {
     private fun displayIDCardInfo() {
         tvID.setText(idCard.id);
         tvName.setText(idCard.name);
-        tvDOB.setText(idCard.birthDay);
+        tvDOB.setText(idCard.dob);
         tvAdd.setText(idCard.address);
         tvIssuedDate.setText(idCard.issuedDate);
-        tvIssuedAdd.setText(idCard.issuedAdd);
+        tvIssuedAdd.setText(idCard.issuedAddress);
 
         editId.setOnClickListener { enableEditText(tvID) }
         editName.setOnClickListener { enableEditText(tvName) }
@@ -53,10 +53,10 @@ class ResultActivity : AppCompatActivity() {
     private fun saveIdCard() {
         idCard.id = tvID.text.toString();
         idCard.name = tvName.text.toString();
-        idCard.birthDay = tvDOB.text.toString();
+        idCard.dob = tvDOB.text.toString();
         idCard.address = tvAdd.text.toString();
         idCard.issuedDate = tvIssuedDate.text.toString();
-        idCard.issuedAdd = tvIssuedAdd.text.toString();
+        idCard.issuedAddress = tvIssuedAdd.text.toString();
         disableAll();
         val idCardRepository = IDCardRepositoryImpl();
         idCardRepository.saveIDCard(idCard);

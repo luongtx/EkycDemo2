@@ -2,7 +2,6 @@ package com.example.ekycdemo2
 
 import android.content.Context
 import android.content.Intent
-import android.hardware.Camera.open
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraManager
 import android.os.Build
@@ -15,7 +14,6 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
-import androidx.camera.core.internal.CameraUseCaseAdapter
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import com.example.ekycdemo2.model.IDCard
@@ -24,7 +22,6 @@ import com.example.ekycdemo2.utils.Constants
 import com.example.ekycdemo2.utils.MediaFileIO
 import com.example.ekycdemo2.utils.OCRService
 import kotlinx.android.synthetic.main.activity_text_recognition.*
-import java.nio.channels.AsynchronousFileChannel.open
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -185,6 +182,7 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
         cameraExecutor.shutdown()
         idCardProcessor.close()
         btn_next_step.visibility = View.VISIBLE
+        startIDCardExtraction();
         btn_next_step.setOnClickListener { nextStep() }
     }
 
@@ -194,7 +192,6 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
     }
 
     private fun nextStep() {
-        startIDCardExtraction();
         val intent = Intent(this, FaceDetectionActivity::class.java)
         startActivity(intent)
     }

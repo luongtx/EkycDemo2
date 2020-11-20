@@ -6,7 +6,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_detector_option.*
 
-class ActivityDetectorOption : AppCompatActivity() {
+class ActivityDocumentOption : AppCompatActivity() {
     enum class DocumentType {
         IDCard, DriverLicense, Passport
     }

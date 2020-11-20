@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import com.example.ekycdemo2.utils.Constants
 import com.example.ekycdemo2.utils.Constants.Companion.userPN
@@ -101,7 +100,7 @@ class OTPAuthentication : AppCompatActivity() {
         val firebaseAuth = FirebaseAuth.getInstance();
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener {
             if (it.isSuccessful) {
-                startActivity(Intent(this, ActivityDetectorOption::class.java));
+                startActivity(Intent(this, ActivityDocumentOption::class.java));
             } else {
                 Toast.makeText(this@OTPAuthentication, it.exception?.message, Toast.LENGTH_LONG)
                     .show()
