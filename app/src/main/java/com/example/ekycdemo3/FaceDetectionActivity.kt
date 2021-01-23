@@ -1,25 +1,39 @@
-package com.example.ekycdemo2
+package com.example.ekycdemo3
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.util.Size
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
-import com.example.ekycdemo2.processor.FaceAnalyzer
-import com.example.ekycdemo2.processor.util.FaceRotation
-import com.example.ekycdemo2.processor.util.FaceRotation.Companion.targetFaceRotations
-import com.example.ekycdemo2.utils.Constants
-import com.example.ekycdemo2.utils.MediaFileIO
+import com.example.ekycdemo3.model.FaceVerification
+import com.example.ekycdemo3.processor.FaceAnalyzer
+import com.example.ekycdemo3.processor.util.FaceRotation
+import com.example.ekycdemo3.processor.util.FaceRotation.Companion.targetFaceRotations
+import com.example.ekycdemo3.utils.Constants
+import com.example.ekycdemo3.utils.MediaFileIO
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_face_detection.*
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
+import org.json.JSONObject
+import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.logging.Level.INFO
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer {
     lateinit var cameraExecutor: ExecutorService
     lateinit var faceAnalyzer: FaceAnalyzer
@@ -121,7 +135,60 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
         iv_check.visibility = View.VISIBLE
         tv_direct.text = (getString(R.string.auth_success))
         stopAll()
+        startFaceVerification()
         nextStep()
+    }
+
+    private fun startFaceVerification() {
+        //create encode base64 for id card image
+        IDCardScannerActivity.idCard.storedFiles[0].readBytes();
+        val byteArrayIDCard =
+            Files.readAllBytes(Paths.get(IDCardScannerActivity.idCard.storedFiles[0].absolutePath));
+        val encodedIDCardString = java.util.Base64.getEncoder().encodeToString(byteArrayIDCard);
+
+        //create encode base64 for face image
+        val sharedReferenced = getSharedPreferences("prefs", MODE_PRIVATE)
+        val pathFace = sharedReferenced.getString("img_face", "")
+        val byteArrayFace = Files.readAllBytes(Paths.get(pathFace));
+        val encodedFaceString = java.util.Base64.getEncoder().encodeToString(byteArrayFace);
+
+        // call api client
+        val client = OkHttpClient().newBuilder()
+            .build();
+        val mediaType = "application/json".toMediaTypeOrNull();
+
+        val jsonObject = JSONObject();
+        jsonObject.put("model_name", "VGG-Face");
+        val jsonArray = JSONArray();
+        val jsonChild = JSONObject();
+        jsonChild.put("img1", "data:image/jpeg;base64,$encodedIDCardString");
+        jsonChild.put("img2", "data:image/jpeg;base64,$encodedFaceString");
+        jsonArray.put(jsonChild);
+        jsonObject.put("img", jsonArray);
+
+        val requestBody = jsonObject.toString().toRequestBody(mediaType);
+
+        val request: Request = Request.Builder()
+            .url("http://192.168.1.107:5000/verify")
+            .method("POST", requestBody)
+            .addHeader("Content-Type", "application/json")
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+//                println("An error occur: "+e.printStackTrace());
+                Log.d("ERROR: ", e.message!!);
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                Log.i("RESULT CODE: ", "${response.code} ${response.message}");
+//                Log.i("RESULT BODY: ", response.body!!.string());
+                val faceVerification =
+                    Gson().fromJson(response.body!!.string(), FaceVerification::class.java);
+                Log.i("RESULT BODY: ", faceVerification.pair.toString());
+                println(faceVerification.pair);
+            }
+        })
     }
 
     override fun onFaceAngleChange(rotation: String) {

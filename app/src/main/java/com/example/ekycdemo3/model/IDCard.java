@@ -1,8 +1,5 @@
-package com.example.ekycdemo2.model;
+package com.example.ekycdemo3.model;
 
-import android.util.Log;
-
-import com.example.ekycdemo2.utils.Constants;
 import com.google.firebase.database.Exclude;
 
 import java.io.File;

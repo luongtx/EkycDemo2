@@ -1,4 +1,4 @@
-package com.example.ekycdemo2
+package com.example.ekycdemo3
 
 import android.net.Uri
 import android.os.Bundle
@@ -7,9 +7,9 @@ import android.util.Log
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import cn.pedant.SweetAlert.SweetAlertDialog
-import com.example.ekycdemo2.IDCardScannerActivity.Companion.idCard
-import com.example.ekycdemo2.repos.impl.IDCardRepositoryImpl
-import com.example.ekycdemo2.utils.Constants
+import com.example.ekycdemo3.IDCardScannerActivity.Companion.idCard
+import com.example.ekycdemo3.repos.impl.IDCardRepositoryImpl
+import com.example.ekycdemo3.utils.Constants
 import kotlinx.android.synthetic.main.activity_result.*
 import java.io.File
 

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">EKycDemo2</string>
+    <string name="app_name">EKycDemo3</string>
     <string name="show_me_front">Xuất trình mặt trước CMND</string>
     <string name="show_me_back">Xuất trình mặt sau CMND</string>
     <string name="auth_success">Xác thực thành công!</string>

@@ -1,4 +1,4 @@
-package com.example.ekycdemo2.model;
+package com.example.ekycdemo3.model;
 
 
 import com.google.gson.annotations.Expose;

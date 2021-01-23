@@ -1,7 +1,7 @@
-package com.example.ekycdemo2.utils
+package com.example.ekycdemo3.utils
 
 import android.content.Context
-import com.example.ekycdemo2.R
+import com.example.ekycdemo3.R
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*

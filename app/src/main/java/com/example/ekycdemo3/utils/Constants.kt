@@ -1,7 +1,7 @@
-package com.example.ekycdemo2.utils
+package com.example.ekycdemo3.utils
 
-import com.example.ekycdemo2.model.IDCard
-import com.example.ekycdemo2.processor.util.FaceRotation
+import com.example.ekycdemo3.model.IDCard
+import com.example.ekycdemo3.processor.util.FaceRotation
 
 class Constants {
     companion object {

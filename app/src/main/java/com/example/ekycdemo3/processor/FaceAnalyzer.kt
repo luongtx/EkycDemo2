@@ -1,9 +1,9 @@
-package com.example.ekycdemo2.processor
+package com.example.ekycdemo3.processor
 
 import android.annotation.SuppressLint
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import com.example.ekycdemo2.processor.util.FaceRotation
+import com.example.ekycdemo3.processor.util.FaceRotation
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection

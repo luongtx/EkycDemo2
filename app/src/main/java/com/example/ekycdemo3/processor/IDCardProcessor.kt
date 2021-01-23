@@ -1,12 +1,12 @@
-package com.example.ekycdemo2.processor
+package com.example.ekycdemo3.processor
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import com.example.ekycdemo2.IDCardScannerActivity.Companion.idCard
-import com.example.ekycdemo2.utils.Constants.Companion.TAG
+import com.example.ekycdemo3.IDCardScannerActivity.Companion.idCard
+import com.example.ekycdemo3.utils.Constants.Companion.TAG
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition

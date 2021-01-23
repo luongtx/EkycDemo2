@@ -1,4 +1,4 @@
-package com.example.ekycdemo2
+package com.example.ekycdemo3
 
 import android.app.ProgressDialog
 import android.content.Context
@@ -18,13 +18,13 @@ import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import cn.pedant.SweetAlert.SweetAlertDialog
-import com.example.ekycdemo2.model.IDCard
-import com.example.ekycdemo2.model.OCRResults
-import com.example.ekycdemo2.processor.IDCardProcessor
-import com.example.ekycdemo2.utils.Constants
-import com.example.ekycdemo2.utils.Constants.Companion.I_HEIGHT
-import com.example.ekycdemo2.utils.Constants.Companion.I_WIDTH
-import com.example.ekycdemo2.utils.MediaFileIO
+import com.example.ekycdemo3.model.IDCard
+import com.example.ekycdemo3.model.OCRResults
+import com.example.ekycdemo3.processor.IDCardProcessor
+import com.example.ekycdemo3.utils.Constants
+import com.example.ekycdemo3.utils.Constants.Companion.I_HEIGHT
+import com.example.ekycdemo3.utils.Constants.Companion.I_WIDTH
+import com.example.ekycdemo3.utils.MediaFileIO
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_text_recognition.*
 import okhttp3.*
@@ -185,7 +185,8 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
                         .show()
                     cameraProvider?.unbindAll();
                     idCard.storedFiles.add(photoFile);
-                    extractIDCard(photoFile, auto);
+                    onProcessCompleted();
+//                    extractIDCard(photoFile, auto);
                 }
             })
     }

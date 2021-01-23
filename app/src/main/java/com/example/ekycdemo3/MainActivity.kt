@@ -1,4 +1,4 @@
-package com.example.ekycdemo2
+package com.example.ekycdemo3
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -7,8 +7,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.ekycdemo2.utils.Constants
-import com.example.ekycdemo2.utils.Constants.Companion.userPN
+import com.example.ekycdemo3.utils.Constants
+import com.example.ekycdemo3.utils.Constants.Companion.userPN
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         saveData();
         //request permission
         if (allPermissionsGranted()) {
-            startActivity(Intent(this, OTPAuthentication::class.java));
+            startActivity(Intent(this, ActivityDocumentOption::class.java));
         } else {
             ActivityCompat.requestPermissions(
                 this, Constants.REQUIRED_PERMISSIONS, Constants.REQUEST_CODE_PERMISSIONS

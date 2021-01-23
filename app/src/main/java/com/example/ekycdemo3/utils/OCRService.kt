@@ -1,21 +1,20 @@
-package com.example.ekycdemo2.utils
+package com.example.ekycdemo3.utils
 
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
-import com.example.ekycdemo2.FaceDetectionActivity
-import com.example.ekycdemo2.IDCardScannerActivity.Companion.idCard
-import com.example.ekycdemo2.model.OCRResults
-import com.example.ekycdemo2.utils.Constants.Companion.API_ENDPOINT
-import com.example.ekycdemo2.utils.Constants.Companion.AUTH_HEADER
+import com.example.ekycdemo3.FaceDetectionActivity
+import com.example.ekycdemo3.IDCardScannerActivity.Companion.idCard
+import com.example.ekycdemo3.model.OCRResults
+import com.example.ekycdemo3.utils.Constants.Companion.API_ENDPOINT
+import com.example.ekycdemo3.utils.Constants.Companion.AUTH_HEADER
 import com.google.gson.Gson
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
-import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 
