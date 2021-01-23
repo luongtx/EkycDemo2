@@ -185,8 +185,8 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
                         .show()
                     cameraProvider?.unbindAll();
                     idCard.storedFiles.add(photoFile);
-                    onProcessCompleted();
-//                    extractIDCard(photoFile, auto);
+//                    onProcessCompleted();
+                    extractIDCard(photoFile, auto);
                 }
             })
     }
