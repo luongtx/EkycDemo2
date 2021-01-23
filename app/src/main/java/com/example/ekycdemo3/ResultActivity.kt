@@ -25,8 +25,10 @@ class ResultActivity : AppCompatActivity() {
             Log.d(Constants.TAG, e.message.toString());
         }
         val sharedReferenced = getSharedPreferences("prefs", MODE_PRIVATE)
-        val pathFace = sharedReferenced.getString("img_face", "")
+        val pathFace = sharedReferenced.getString("face_path", "")
         img_face.setImageURI(Uri.fromFile(File(pathFace!!)))
+        val precision = sharedReferenced.getString("precision", "0") + " %";
+        tvPrecision.text = precision;
         displayIDCardInfo();
 
     }

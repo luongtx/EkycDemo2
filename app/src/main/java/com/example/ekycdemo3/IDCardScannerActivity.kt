@@ -111,7 +111,8 @@ class IDCardScannerActivity : AppCompatActivity(), IDCardProcessor.CallBackAnaly
             preview = Preview.Builder().build().also {
                 it.setSurfaceProvider(prv_text_recognition.createSurfaceProvider())
             }
-            imageCapture = ImageCapture.Builder().setTargetResolution(Size(I_WIDTH, I_HEIGHT)).build()
+            imageCapture =
+                ImageCapture.Builder().setTargetResolution(Size(I_WIDTH, I_HEIGHT)).build()
             cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
             if (auto) {
                 val imageAnalysis =

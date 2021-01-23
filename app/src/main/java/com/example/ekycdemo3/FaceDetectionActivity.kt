@@ -1,5 +1,6 @@
 package com.example.ekycdemo3
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -30,7 +31,6 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import java.util.logging.Level.INFO
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -40,6 +40,8 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
 
     //    lateinit var ttsSpeaker: TTSSpeaker
     private var imageCapture: ImageCapture? = null
+
+    lateinit var progressDialog: ProgressDialog;
 
     //lateinit var tfv_direct: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,22 +107,31 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    saveFilePath(photoFile.absolutePath)
+//                    saveFilePath(photoFile.absolutePath)
+                    savePrefsData("face_path", photoFile.absolutePath);
                     Log.d(Constants.TAG, "Photo was captured!")
                 }
             })
     }
 
-    private fun saveFilePath(path: String) {
+//    private fun saveFilePath(path: String) {
+//        val sharedReferenced = getSharedPreferences("prefs", Context.MODE_PRIVATE)
+//        val editor = sharedReferenced.edit()
+//        editor.putString("face_path", path)
+//        editor.apply()
+//    }
+
+    private fun savePrefsData(key: String, value: String) {
         val sharedReferenced = getSharedPreferences("prefs", Context.MODE_PRIVATE)
         val editor = sharedReferenced.edit()
-        editor.putString("img_face", path)
+        editor.putString(key, value)
         editor.apply()
     }
 
     @JvmName("getOutputDirectory1")
 
-    private fun stopAll() {
+    private fun stopDetection() {
+        tv_direct.text = "";
         Thread.sleep(1000)
         faceAnalyzer.close()
         cameraExecutor.shutdown()
@@ -132,14 +143,11 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
     }
 
     private fun onDetectionCompleted() {
-        iv_check.visibility = View.VISIBLE
-        tv_direct.text = (getString(R.string.auth_success))
-        stopAll()
-        startFaceVerification()
-        nextStep()
+        stopDetection()
+        startVerification()
     }
 
-    private fun startFaceVerification() {
+    private fun startVerification() {
         //create encode base64 for id card image
         IDCardScannerActivity.idCard.storedFiles[0].readBytes();
         val byteArrayIDCard =
@@ -148,7 +156,7 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
 
         //create encode base64 for face image
         val sharedReferenced = getSharedPreferences("prefs", MODE_PRIVATE)
-        val pathFace = sharedReferenced.getString("img_face", "")
+        val pathFace = sharedReferenced.getString("face_path", "")
         val byteArrayFace = Files.readAllBytes(Paths.get(pathFace));
         val encodedFaceString = java.util.Base64.getEncoder().encodeToString(byteArrayFace);
 
@@ -169,7 +177,7 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
         val requestBody = jsonObject.toString().toRequestBody(mediaType);
 
         val request: Request = Request.Builder()
-            .url("http://192.168.1.107:5000/verify")
+            .url("http://192.168.43.8:5000/verify")
             .method("POST", requestBody)
             .addHeader("Content-Type", "application/json")
             .build()
@@ -178,17 +186,37 @@ class FaceDetectionActivity : AppCompatActivity(), FaceAnalyzer.CallBackAnalyzer
             override fun onFailure(call: Call, e: IOException) {
 //                println("An error occur: "+e.printStackTrace());
                 Log.d("ERROR: ", e.message!!);
+                progressDialog.dismiss();
             }
 
             override fun onResponse(call: Call, response: Response) {
-                Log.i("RESULT CODE: ", "${response.code} ${response.message}");
-//                Log.i("RESULT BODY: ", response.body!!.string());
-                val faceVerification =
-                    Gson().fromJson(response.body!!.string(), FaceVerification::class.java);
-                Log.i("RESULT BODY: ", faceVerification.pair.toString());
-                println(faceVerification.pair);
+                if (response.isSuccessful) {
+                    runOnUiThread {
+                        progressDialog.dismiss();
+                        val faceVerification =
+                            Gson().fromJson(response.body!!.string(), FaceVerification::class.java);
+                        Log.i("RESULT BODY: ", faceVerification.pair.toString());
+                        if (faceVerification.pair.verified) {
+                            iv_check.visibility = View.VISIBLE
+                            tv_direct.text = (getString(R.string.auth_success))
+                            val precision = (1 - faceVerification.pair.distance) * 100;
+                            savePrefsData("precision", precision.toString());
+                            nextStep();
+                        } else {
+                            iv_check.setImageResource(R.drawable.error_center_x);
+                            tv_direct.text = getString(R.string.auth_failed);
+                        }
+                    }
+                }
             }
         })
+        showProgressDialog()
+    }
+
+    private fun showProgressDialog() {
+        progressDialog = ProgressDialog(this)
+        progressDialog.setMessage("Vui lòng đợi...")
+        progressDialog.show()
     }
 
     override fun onFaceAngleChange(rotation: String) {
